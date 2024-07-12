@@ -6,7 +6,14 @@ const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '700'], // Choose the weights you need
   variable: '--font-poppins', // Optional: for use with CSS variables
-})
+},
+  {
+    subsets: ['latin'],
+    weight: ['600'], // Choose the weights you need
+    variable: '--font-poppins-bold', // Optional: for use with CSS variables
+  },
+
+)
 
 export const metadata = {
   title: "ezummarizer",
