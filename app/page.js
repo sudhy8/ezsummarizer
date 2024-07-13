@@ -55,7 +55,7 @@ export default function ElevateAppBar() {
         
       });
   };
-  console.log(errors);
+  
 
 
   const content = watch("Content");
@@ -66,7 +66,7 @@ export default function ElevateAppBar() {
     const response = await fetch(
       "https://pegasus-tfhaf.eastus2.inference.ml.azure.com/score",
       {
-        headers: { Authorization: "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk3QTcyRUQyOUNFMjMwMTQwQjVGNzFEOTkyODk2NzBDRDRGNEJFMzUiLCJ0eXAiOiJKV1QifQ.eyJjYW5SZWZyZXNoIjoiRmFsc2UiLCJ3b3Jrc3BhY2VJZCI6ImM2YjhmY2JlLTFhYmQtNDVjYy1iNzE3LWEwMTU0N2MwZjgwMSIsInRpZCI6ImI2NDE3Y2QwLTFmNzMtNDQ3MS05YTM5LTIwOTUzODIyYTM0YSIsIm9pZCI6ImU3MzBkNWFkLWE1MzItNGYwZS05Nzg5LTAwMjUxNjQzMTdiNCIsImFjdGlvbnMiOiJbXCJNaWNyb3NvZnQuTWFjaGluZUxlYXJuaW5nU2VydmljZXMvd29ya3NwYWNlcy9vbmxpbmVFbmRwb2ludHMvc2NvcmUvYWN0aW9uXCJdIiwiZW5kcG9pbnROYW1lIjoicGVnYXN1cy10ZmhhZiIsInNlcnZpY2VJZCI6InBlZ2FzdXMtdGZoYWYiLCJleHAiOjE3MjA5ODk1NjksImlzcyI6ImF6dXJlbWwiLCJhdWQiOiJhenVyZW1sIn0.u7yQf3JhfJWopAJkOnWwFZ_yfsAAOA5KBeeZL0MwYBlSgIRocHanG6BiLeaxRSfVn6qX_Yrp0YYlqoIg2quGrbbZx5qVTB9dQUN3_Og2YS0_YAi8GdtIcEoi4ZfprJRbAMH5gjVEfMMzs943MQoq0FTkXTPRok36xpMD5exK0ltEybWBKFNv52R2W-KFTshKhPG9QK6xRSXUFePlLsK673udEB9Veb40FB9JMKRVjlGtPjrS1EoQisCb_-WAQbV_IeTvxo5kIn_SRMm2JdhGeHQrJ8BYq4oUtEpTLxBOFhlCnodAcEQY_PbjXSnrVaET4iLWoMsgOpj7Qwdupbgb_Q" },
+        headers: { Authorization: "Bearer" },
         method: "POST",
         body: JSON.stringify(data),
       }
