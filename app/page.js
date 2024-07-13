@@ -165,22 +165,23 @@ export default function ElevateAppBar() {
             <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
               <Grid item container>
                 <Grid item xs={12}>
-                  <textarea rows="10" style={{ fontFamily: 'var(--font-poppins)', width: "100%", border: "solid 1px #007aff", borderRadius: '10px', padding: "10px" }} {...register("Content", {
+                  <textarea rows="10" style={{ fontFamily: "var(--font-poppins)", width: "100%", border: "solid 1px #007aff", borderRadius: "10px", padding: "10px" }} {...register("Content", {
                     required: "This field is required",
                     maxLength: { value: 500, message: "Maximum length is 500 characters" },
                     minLength: { value: 48, message: "Minimum length is 48 characters" }
                   })} />
 
                 </Grid>
-                <Grid item xs={12} style={{ padding: "0px", display: 'flex', justifyContent: 'flex-end', margin: '0px', fontSize: '12px' }}>
+              <Grid item xs={12} style={{ padding: "0px", display: "flex", justifyContent: "flex-end", margin: "0px", fontSize: "12px" }}>
                   {charCount} / 500
                 </Grid>
-                <Grid item xs={12} style={{ padding: "0px", display: 'flex', justifyContent: 'flex-end', margin: '0px', fontSize: '12px' }}>
-                  {errors.Content && <p style={{ color: 'red' }}>{errors.Content.message}</p>}
+              <Grid item xs={12} style={{ padding: "0px", display: "flex", justifyContent: "flex-end", margin: "0px", fontSize: "12px" }}>
+                {errors.Content && <p style={{ color: "red" }}>{errors.Content.message}</p>}
                 </Grid>
-                <Grid item xs={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Grid item xs={12} style={{
+                display: "flex", justifyContent: "flex-end" }}>
 
-                  <Button type="submit" variant="contained" style={{ background: '#cce4ff', color: '#0069ff', boxShadow: 'none', fontFamily: 'var(--font-poppins-bold)', textTransform: 'none', fontWeight: 500 }}>Let's Summarize</Button>
+                <Button type="submit" variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Summarize</Button>
                   
                 </Grid>
               </Grid>
@@ -190,7 +191,7 @@ export default function ElevateAppBar() {
 
           </Grid>
         
-          {/* <Grid container >
+          <Grid container >
 
             <Grid item container xs={12} style={{ padding: "15px", background: "white", borderRadius: "15px" }} >
               <Grid item xs={12} style={{ padding: "15px 15px 0px" }}>
@@ -238,7 +239,7 @@ export default function ElevateAppBar() {
               </Grid>
 
             </Grid>
-          </Grid> */}
+          </Grid>
         
 
         
