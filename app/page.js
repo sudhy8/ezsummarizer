@@ -161,7 +161,7 @@ export default function ElevateAppBar() {
 
           </Grid>
 
-          {/* <Grid container style={{ padding: "15px" }}>
+          <Grid container style={{ padding: "15px" }}>
             <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
               <Grid item container>
                 <Grid item xs={12}>
@@ -190,7 +190,7 @@ export default function ElevateAppBar() {
 
           </Grid>
         
-          <Grid container >
+          {/* <Grid container >
 
             <Grid item container xs={12} style={{ padding: "15px", background: "white", borderRadius: "15px" }} >
               <Grid item xs={12} style={{ padding: "15px 15px 0px" }}>
