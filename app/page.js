@@ -240,6 +240,7 @@ export default function ElevateAppBar() {
 
         
       </Container>
+{/* 
       <Grid container style={{ background:'#007aff', padding:'30px 30px'}}>
         <Grid item xs={12}>
 
@@ -261,6 +262,7 @@ export default function ElevateAppBar() {
         </Grid>
 
       </Grid>
+       */}
     </React.Fragment>
   );
 }
