@@ -108,7 +108,7 @@ export default function ElevateAppBar() {
 
       </Box>
 
-      {/* <AppBar position="sticky" elevation={scrollPosition > 50 ? 4 : 0} color=''>
+      <AppBar position="sticky" elevation={scrollPosition > 50 ? 4 : 0} color=''>
         <Toolbar>
           <Box component="section"  sx={{ p: { xs: 1, sm: 2, lg: 5 } }}></Box>
             <Grid container>
@@ -135,113 +135,115 @@ export default function ElevateAppBar() {
       </AppBar>
       
       <Toolbar />
-      <Container style={{
-        padding: "84px 25px",
-        background: 'aliceblue', borderRadius: '35px',
-        marginBottom: '45px',
-}}>
-        <Grid container >
-          <Grid item xs={12} style={{textAlign:'center'}}>
-            <Box sx={{ p: 1 }}>
-              <Typography variant="h4" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 600 }}>Introducing <span style={{ color:'#007aff'}}>EzSummarizer.ai</span> ✨</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} style={{ textAlign: 'center',padding:"15px" }}>
-            <Box sx={{ p: 1 }}>
-              <Typography variant="p" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 500,fontSize:'1.4rem',color:"grey" }}>
 
-                EzSummarizer is a user-friendly online tool that condenses lengthy texts into concise summaries. With just a few clicks, it helps users quickly grasp the key points of any content, saving time and improving comprehension.
+      {/* {
+        <Container style={{
+          padding: "84px 25px",
+          background: 'aliceblue', borderRadius: '35px',
+          marginBottom: '45px',
+        }}>
+          <Grid container >
+            <Grid item xs={12} style={{ textAlign: 'center' }}>
+              <Box sx={{ p: 1 }}>
+                <Typography variant="h4" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 600 }}>Introducing <span style={{ color: '#007aff' }}>EzSummarizer.ai</span> ✨</Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} style={{ textAlign: 'center', padding: "15px" }}>
+              <Box sx={{ p: 1 }}>
+                <Typography variant="p" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 500, fontSize: '1.4rem', color: "grey" }}>
 
-              </Typography>
-            </Box>
-          </Grid>
+                  EzSummarizer is a user-friendly online tool that condenses lengthy texts into concise summaries. With just a few clicks, it helps users quickly grasp the key points of any content, saving time and improving comprehension.
+
+                </Typography>
+              </Box>
+            </Grid>
             
 
-        </Grid>
+          </Grid>
 
-        <Grid container style={{ padding: "15px" }}>
-          <form onSubmit={handleSubmit(onSubmit)} style={{width:"100%"}}>
-            <Grid item container>
-              <Grid item xs={12}>
-                <textarea rows="10" style={{ fontFamily: 'var(--font-poppins)', width: "100%", border: "solid 1px #007aff", borderRadius: '10px', padding: "10px" }} {...register("Content", {
-                  required: "This field is required",
-                  maxLength: { value: 500, message: "Maximum length is 500 characters" },
-                  minLength: { value: 48, message: "Minimum length is 48 characters" }
-                })} />
+          <Grid container style={{ padding: "15px" }}>
+            <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
+              <Grid item container>
+                <Grid item xs={12}>
+                  <textarea rows="10" style={{ fontFamily: 'var(--font-poppins)', width: "100%", border: "solid 1px #007aff", borderRadius: '10px', padding: "10px" }} {...register("Content", {
+                    required: "This field is required",
+                    maxLength: { value: 500, message: "Maximum length is 500 characters" },
+                    minLength: { value: 48, message: "Minimum length is 48 characters" }
+                  })} />
 
-              </Grid>
-              <Grid item xs={12} style={{ padding: "0px", display: 'flex', justifyContent: 'flex-end', margin: '0px',fontSize:'12px' }}>
-                {charCount} / 500
-              </Grid>
-              <Grid item xs={12} style={{ padding: "0px", display: 'flex', justifyContent: 'flex-end', margin: '0px', fontSize: '12px' }}>
-                {errors.Content && <p style={{ color: 'red' }}>{errors.Content.message}</p>}
-              </Grid>
-              <Grid item xs={12} style={{display:'flex',justifyContent:'flex-end'}}>
+                </Grid>
+                <Grid item xs={12} style={{ padding: "0px", display: 'flex', justifyContent: 'flex-end', margin: '0px', fontSize: '12px' }}>
+                  {charCount} / 500
+                </Grid>
+                <Grid item xs={12} style={{ padding: "0px", display: 'flex', justifyContent: 'flex-end', margin: '0px', fontSize: '12px' }}>
+                  {errors.Content && <p style={{ color: 'red' }}>{errors.Content.message}</p>}
+                </Grid>
+                <Grid item xs={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
 
-                <Button type="submit" variant="contained" style={{ background:'#cce4ff',color:'#0069ff',boxShadow:'none',fontFamily: 'var(--font-poppins-bold)', textTransform: 'none', fontWeight: 500 }}>Let's Summarize</Button>
-                {/* <input type="submit" /> */}
+                  <Button type="submit" variant="contained" style={{ background: '#cce4ff', color: '#0069ff', boxShadow: 'none', fontFamily: 'var(--font-poppins-bold)', textTransform: 'none', fontWeight: 500 }}>Let's Summarize</Button>
+                  
+                </Grid>
               </Grid>
-            </Grid>
            
             
-          </form>
-
-        </Grid>
-        
-        <Grid container >
-
-          <Grid item container xs={12} style={{  padding: "15px", background: "white",borderRadius:"15px" }} >
-            <Grid item xs={12} style={{  padding: "15px 15px 0px" }}>
-              <Typography variant="h5" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight:500, color: "#007aff", fontSize: '1.2rem',padding:"0px" }}>
-
-                Academic research
-              </Typography>
-            </Grid>
-            <Grid item xs={12} style={{  padding: "0px 15px" }}>
-              <Typography variant="p" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '1rem', color: "#4f4f4f" }}>
-
-               Students and scholars can use ezSummarizer to quickly distill long academic papers and articles, making literature reviews more efficient and manageable.
-
-              </Typography>
-            </Grid>
-            <Grid item xs={12} style={{ padding: "15px 15px 0px" }}>
-              <Divider />
-            </Grid>
-            <Grid item xs={12} style={{ padding: "15px 15px 0px" }}>
-              <Typography variant="h5" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 500, color: "#007aff", fontSize: '1.2rem', padding: "0px" }}>
-
-                Business intelligence
-              </Typography>
-            </Grid>
-            <Grid item xs={12} style={{ padding: "0px 15px" }}>
-              <Typography variant="p" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '1rem', color: "#4f4f4f" }}>
-
-                Professionals can summarize market reports and competitor analyses, allowing for faster decision-making and strategy development.
-              </Typography>
-            </Grid>
-            <Grid item xs={12} style={{ padding: "15px 15px 0px" }}>
-              <Divider />
-            </Grid>
-            <Grid item xs={12} style={{ padding: "15px 15px 0px" }}>
-              <Typography variant="h5" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 500, color: "#007aff", fontSize: '1.2rem', padding: "0px" }}>
-
-                News consumption
-              </Typography>
-            </Grid>
-            <Grid item xs={12} style={{ padding: "0px 15px" }}>
-              <Typography variant="p" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '1rem', color: "#4f4f4f" }}>
-
-                Readers can summarize lengthy news articles or reports, enabling them to stay informed on multiple topics without spending excessive time reading full texts.
-              </Typography>
-            </Grid>
+            </form>
 
           </Grid>
-        </Grid>
+        
+          <Grid container >
+
+            <Grid item container xs={12} style={{ padding: "15px", background: "white", borderRadius: "15px" }} >
+              <Grid item xs={12} style={{ padding: "15px 15px 0px" }}>
+                <Typography variant="h5" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 500, color: "#007aff", fontSize: '1.2rem', padding: "0px" }}>
+
+                  Academic research
+                </Typography>
+              </Grid>
+              <Grid item xs={12} style={{ padding: "0px 15px" }}>
+                <Typography variant="p" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '1rem', color: "#4f4f4f" }}>
+
+                  Students and scholars can use ezSummarizer to quickly distill long academic papers and articles, making literature reviews more efficient and manageable.
+
+                </Typography>
+              </Grid>
+              <Grid item xs={12} style={{ padding: "15px 15px 0px" }}>
+                <Divider />
+              </Grid>
+              <Grid item xs={12} style={{ padding: "15px 15px 0px" }}>
+                <Typography variant="h5" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 500, color: "#007aff", fontSize: '1.2rem', padding: "0px" }}>
+
+                  Business intelligence
+                </Typography>
+              </Grid>
+              <Grid item xs={12} style={{ padding: "0px 15px" }}>
+                <Typography variant="p" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '1rem', color: "#4f4f4f" }}>
+
+                  Professionals can summarize market reports and competitor analyses, allowing for faster decision-making and strategy development.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} style={{ padding: "15px 15px 0px" }}>
+                <Divider />
+              </Grid>
+              <Grid item xs={12} style={{ padding: "15px 15px 0px" }}>
+                <Typography variant="h5" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 500, color: "#007aff", fontSize: '1.2rem', padding: "0px" }}>
+
+                  News consumption
+                </Typography>
+              </Grid>
+              <Grid item xs={12} style={{ padding: "0px 15px" }}>
+                <Typography variant="p" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '1rem', color: "#4f4f4f" }}>
+
+                  Readers can summarize lengthy news articles or reports, enabling them to stay informed on multiple topics without spending excessive time reading full texts.
+                </Typography>
+              </Grid>
+
+            </Grid>
+          </Grid>
         
 
         
-      </Container> */}
-
+        </Container>
+      } */}
       
 {/* 
       <Grid container style={{ background:'#007aff', padding:'30px 30px'}}>
@@ -266,6 +268,8 @@ export default function ElevateAppBar() {
 
       </Grid>
        */}
+      
+
     </React.Fragment>
   );
 }
