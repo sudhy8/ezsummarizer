@@ -136,7 +136,7 @@ export default function ElevateAppBar() {
       
       <Toolbar />
 
-      {/* {
+      
         <Container style={{
           padding: "84px 25px",
           background: 'aliceblue', borderRadius: '35px',
@@ -243,7 +243,7 @@ export default function ElevateAppBar() {
 
         
         </Container>
-      } */}
+      
       
 
       <Grid container style={{ background:'#007aff', padding:'30px 30px'}}>
