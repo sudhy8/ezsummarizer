@@ -13,6 +13,8 @@ import { Grid } from '@mui/material';
 import styles from './page.module.css';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
+import { useForm } from 'react-hook-form';
+
 function ElevationScroll(props) {
   const { children } = props;
   const trigger = useScrollTrigger({
@@ -33,7 +35,60 @@ export default function ElevateAppBar() {
 
   const [scrollPosition, setScrollPosition] = useState(0);
 
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const [charCount, setCharCount] = useState(0);
+  const onSubmit = data => {
+    console.log(data)
+    
+
+    const param = {
+      "inputs": data
+    };
+
+    query(param)
+      .then(result => {
+        console.log(result);
+        
+
+      })
+      .catch(error => {
+        
+      });
+  };
+  console.log(errors);
+
+
+  const content = watch("Content");
+
+
+  async function query(data) {
+    console.log("bit", data)
+    const response = await fetch(
+      "https://pegasus-tfhaf.eastus2.inference.ml.azure.com/score",
+      {
+        headers: { Authorization: "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk3QTcyRUQyOUNFMjMwMTQwQjVGNzFEOTkyODk2NzBDRDRGNEJFMzUiLCJ0eXAiOiJKV1QifQ.eyJjYW5SZWZyZXNoIjoiRmFsc2UiLCJ3b3Jrc3BhY2VJZCI6ImM2YjhmY2JlLTFhYmQtNDVjYy1iNzE3LWEwMTU0N2MwZjgwMSIsInRpZCI6ImI2NDE3Y2QwLTFmNzMtNDQ3MS05YTM5LTIwOTUzODIyYTM0YSIsIm9pZCI6ImU3MzBkNWFkLWE1MzItNGYwZS05Nzg5LTAwMjUxNjQzMTdiNCIsImFjdGlvbnMiOiJbXCJNaWNyb3NvZnQuTWFjaGluZUxlYXJuaW5nU2VydmljZXMvd29ya3NwYWNlcy9vbmxpbmVFbmRwb2ludHMvc2NvcmUvYWN0aW9uXCJdIiwiZW5kcG9pbnROYW1lIjoicGVnYXN1cy10ZmhhZiIsInNlcnZpY2VJZCI6InBlZ2FzdXMtdGZoYWYiLCJleHAiOjE3MjA5ODk1NjksImlzcyI6ImF6dXJlbWwiLCJhdWQiOiJhenVyZW1sIn0.u7yQf3JhfJWopAJkOnWwFZ_yfsAAOA5KBeeZL0MwYBlSgIRocHanG6BiLeaxRSfVn6qX_Yrp0YYlqoIg2quGrbbZx5qVTB9dQUN3_Og2YS0_YAi8GdtIcEoi4ZfprJRbAMH5gjVEfMMzs943MQoq0FTkXTPRok36xpMD5exK0ltEybWBKFNv52R2W-KFTshKhPG9QK6xRSXUFePlLsK673udEB9Veb40FB9JMKRVjlGtPjrS1EoQisCb_-WAQbV_IeTvxo5kIn_SRMm2JdhGeHQrJ8BYq4oUtEpTLxBOFhlCnodAcEQY_PbjXSnrVaET4iLWoMsgOpj7Qwdupbgb_Q" },
+        method: "POST",
+        body: JSON.stringify(data),
+      }
+    );
+    const result = await response.json();
+    return result;
+  }
+
+
+  
   useEffect(() => {
+    if (content) {
+      setCharCount(content.length);
+    } else {
+      setCharCount(0);
+    }
+  }, [content]);
+
+
+  useEffect( () => {
+   
+
     const updatePosition = () => {
       setScrollPosition(window.scrollY);
     };
@@ -104,7 +159,31 @@ export default function ElevateAppBar() {
         </Grid>
 
         <Grid container style={{ padding: "15px" }}>
-          
+          <form onSubmit={handleSubmit(onSubmit)} style={{width:"100%"}}>
+            <Grid item container>
+              <Grid item xs={12}>
+                <textarea rows="10" style={{ fontFamily: 'var(--font-poppins)', width: "100%", border: "solid 1px #007aff", borderRadius: '10px', padding: "10px" }} {...register("Content", {
+                  required: "This field is required",
+                  maxLength: { value: 500, message: "Maximum length is 500 characters" },
+                  minLength: { value: 48, message: "Minimum length is 48 characters" }
+                })} />
+
+              </Grid>
+              <Grid item xs={12} style={{ padding: "0px", display: 'flex', justifyContent: 'flex-end', margin: '0px',fontSize:'12px' }}>
+                {charCount} / 500
+              </Grid>
+              <Grid item xs={12} style={{ padding: "0px", display: 'flex', justifyContent: 'flex-end', margin: '0px', fontSize: '12px' }}>
+                {errors.Content && <p style={{ color: 'red' }}>{errors.Content.message}</p>}
+              </Grid>
+              <Grid item xs={12} style={{display:'flex',justifyContent:'flex-end'}}>
+
+                <Button type="submit" variant="contained" style={{ background:'#cce4ff',color:'#0069ff',boxShadow:'none',fontFamily: 'var(--font-poppins-bold)', textTransform: 'none', fontWeight: 500 }}>Let's Summarize</Button>
+                {/* <input type="submit" /> */}
+              </Grid>
+            </Grid>
+           
+            
+          </form>
 
         </Grid>
         
