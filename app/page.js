@@ -14,7 +14,12 @@ import styles from './page.module.css';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import { useForm } from 'react-hook-form';
-
+import Typewriter from './TypingEffect';
+import CircularProgress from '@mui/material/CircularProgress';
+import Stack from '@mui/material/Stack';
+import ContentCopyTwoToneIcon from '@mui/icons-material/ContentCopyTwoTone';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function ElevationScroll(props) {
   const { children } = props;
   const trigger = useScrollTrigger({
@@ -37,36 +42,25 @@ export default function ElevateAppBar() {
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [charCount, setCharCount] = useState(0);
-  const onSubmit = data => {
-    console.log(data)
-    
+  const [description, setDescription] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const notify = () => toast.success("Copied!");
 
-    const param = {
-      "inputs": data
-    };
-
-    query(param)
-      .then(result => {
-        console.log(result);
-        
-
-      })
-      .catch(error => {
-        
-      });
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      console.log('Text copied to clipboard');
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
   };
-  
-
-
-  const content = watch("Content");
-
 
   async function query(data) {
     console.log("bit", data)
     const response = await fetch(
-      "https://pegasus-tfhaf.eastus2.inference.ml.azure.com/score",
+      "https://api-inference.huggingface.co/models/google/pegasus-large",
       {
-        headers: { Authorization: "Bearer" },
+        headers: { Authorization: "Bearer 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" },
         method: "POST",
         body: JSON.stringify(data),
       }
@@ -75,6 +69,41 @@ export default function ElevateAppBar() {
     return result;
   }
 
+
+  const onSubmit = data => {
+    setLoading(true)
+    setDescription(null)
+    console.log("*********", data)
+    let val = {
+      inputs: data?.Content
+    }
+    console.log("*********",val)
+    query(val)
+      .then(result => {
+        console.log(result[0].summary_text);
+        setDescription(result[0].summary_text);
+        setLoading(false)
+      })
+      .catch(error => {
+        console.log("-----",error)
+        // Check if the error object has a code property
+        if (error.code) {
+          console.error('Error code:', error.code);
+        } else {
+          console.error('Error:', error);
+        }
+        setLoading(false)
+      });
+    
+    
+  };
+  
+
+
+  const content = watch("Content");
+
+
+ 
 
   
   useEffect(() => {
@@ -189,7 +218,37 @@ export default function ElevateAppBar() {
             
             </form>
 
-          </Grid>
+        </Grid>
+        <Grid container style={{ padding: "15px" }}>
+          <Grid item container xs={12} style={{ padding: "15px 0px",position:'relative' }}>
+            {loading  ?
+              <Stack sx={{ color: 'white' }} spacing={2} direction="row">
+                <label>Loading......</label>
+                <CircularProgress style={{ filter: 'invert(1) drop-shadow(0 0 0.3rem #ffffff70)' }} />
+              </Stack>
+              :
+
+              description ?
+                <Grid item xs={12} style={{ padding: "15px 15px 50px 15px",border:"solid 1px grey"  }}>
+                <Typography variant="h5" component="div" sx={{ flexGrow: 1 }} style={{ fontFamily: 'var(--font-poppins)', fontWeight: 600, color: "#007aff", fontSize: '1.2rem', padding: "0px" }}>
+
+                  Summary
+                </Typography>
+                  <Typewriter text={description} delay={30} />
+                  <Button onClick={() => { copyToClipboard(description); notify() }} startIcon={<ContentCopyTwoToneIcon />} variant="contained" style={{
+                    background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500, position: 'absolute', bottom: "25px",
+                    right: "10px"
+                  }}>Copy</Button>
+                  <ToastContainer hideProgressBar={true} closeOnClick theme={"dark"}/>
+
+              </Grid> :<></>
+
+
+              }
+
+                </Grid>
+
+        </Grid>
         
           <Grid container >
 
