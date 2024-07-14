@@ -20,6 +20,24 @@ import Stack from '@mui/material/Stack';
 import ContentCopyTwoToneIcon from '@mui/icons-material/ContentCopyTwoTone';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Auth } from '@supabase/auth-ui-react'
+import {
+  ThemeSupa,
+} from '@supabase/auth-ui-shared';
+import { createClient } from '@supabase/supabase-js'
+import Avatar from '@mui/material/Avatar';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
+
+
 function ElevationScroll(props) {
   const { children } = props;
   const trigger = useScrollTrigger({
@@ -45,6 +63,31 @@ export default function ElevateAppBar() {
   const [description, setDescription] = useState(null);
   const [loading, setLoading] = useState(false);
   const notify = () => toast.success("Copied!");
+  const [open, setOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  
+  const [session, setSession] = useState(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("session", session)
+      setSession(session)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("session", session)
+      setSession(session)
+    })
+    
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleCloseAuth = () => {
+    setAuthOpen(false);
+  };
+
 
   const copyToClipboard = async (text) => {
     try {
@@ -132,7 +175,44 @@ export default function ElevateAppBar() {
   return (
     <React.Fragment>
       <CssBaseline />
-      
+      <Dialog
+        open={authOpen}
+        onClose={handleCloseAuth}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          style: {
+            backgroundColor: 'rgb(0 0 0 / 43%)', // Adjust the opacity as needed
+            backdropFilter: 'blur(4px)', // Adjust the blur radius as needed
+            WebkitBackdropFilter: 'blur(10px)', // For Safari support
+            border: '1px solid rgba(255, 255, 255, 0.18)',
+            width: '70vw'
+          },
+        }}
+      >
+        <DialogTitle id="alert-dialog-title">
+          <p style={{ color: 'white' }}>
+            Login
+          </p>
+        </DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+
+              <Auth
+                supabaseClient={supabase}
+                providers={['google']}
+                appearance={{ theme: ThemeSupa }}
+              />
+            </Grid>
+
+
+          </Grid>
+
+        </DialogContent>
+
+      </Dialog>
+
       <Box component="section" sx={{ p: 2 }}>
 
       </Box>
@@ -153,9 +233,12 @@ export default function ElevateAppBar() {
               </Grid>
 
 
-            <Grid item sm={8} xs={6} style={{ textAlign: 'end' }}>
-              <Button style={{ fontFamily: 'var(--font-poppins-bold)', textTransform: 'none',fontWeight:500 }}>Log In</Button>
+            <Grid item sm={8} xs={6} style={{ textAlign: 'end',justifyContent:'flex-end',display:'flex' }}>
+              {
+                session ? <Avatar sx={{ width: 30, height: 30 }} alt="User" src={session?.user?.user_metadata?.avatar_url} /> : <Button onClick={() => setAuthOpen(true)} style={{ fontFamily: 'var(--font-poppins-bold)', textTransform: 'none', fontWeight: 500 }}>Log In</Button>
 
+              }
+              
               </Grid>
 
             </Grid>
