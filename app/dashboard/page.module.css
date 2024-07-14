@@ -1,0 +1,13 @@
+.card1{
+  background: rgb(203, 200, 255);
+   
+}
+.appbar {
+  padding: 0px 20px;
+}
+
+.logoDiv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

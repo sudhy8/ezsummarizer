@@ -6,7 +6,9 @@ p {
   font-family: var(--font-poppins);
 }
 
-
+body{
+  margin: 0px;
+}
 /* 
 :root {
   --max-width: 1100px;
