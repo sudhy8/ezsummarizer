@@ -11,3 +11,11 @@
   justify-content: space-between;
   align-items: center;
 }
+.newFolderDiv{
+      display: flex;
+        align-items: center;
+        justify-content: flex-end;
+}
+#folderName{
+  font-family: '__Poppins_e0630c';
+}

@@ -35,6 +35,11 @@ import LogoutTwoToneIcon from '@mui/icons-material/LogoutTwoTone';
 import IconButton from '@mui/material/IconButton';
 import { useRouter } from 'next/navigation';
 import { styled } from '@mui/material/styles';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+
+import TextField from '@mui/material/TextField';
+
+
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -46,13 +51,70 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 }));
 export default function Home() {
     const router = useRouter();
-
+    const { register, reset, handleSubmit, formState: { errors } } = useForm();
     const [session, setSession] = useState(null)
+    const [open, setOpen] = React.useState(false);
+    const [files, setFiles] = React.useState({});
+
+
+    const fetchData = async () => {
+
+
+        let { data: fileManager, error } = await supabase
+            .from('fileManager')
+            .select("*")
+
+            // Filters
+            .eq('userId', session?.user?.id)
+
+        if (fileManager[0]) {
+            console.log("fileManager", JSON.parse(fileManager[0]?.folders))
+
+            setFiles(JSON.parse(fileManager[0]?.folders))
+
+        }
+        else {
+            let param = {
+                Home: {}
+            }
+
+            const { data, error } = await supabase
+                .from('fileManager')
+                .insert([
+                    { userId: session?.user?.id, folders: JSON.stringify(param) },
+                ])
+                .select()
+            
+            
+            setFiles({ Home: {} })
+        }
+
+    }
+
+
+    useEffect(() => {
+        if (session?.user?.id) {
+            fetchData()
+
+        }
+}, [session?.user?.id])
+
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        reset();
+    };
+
+
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             console.log("session", session)
             setSession(session)
-            if(!session){
+            if (!session) {
                 router.push('/');
             }
         })
@@ -80,10 +142,80 @@ export default function Home() {
         }
     }
 
+    const newFolder = () => {
+        handleClickOpen()
+    }
+
+    
+    const onSubmit = async (folderName) => {
+
+        console.log("----------------------", folderName?.folder)
+        console.log("-----------session-----------", session?.user?.id)
+        var name = folderName?.folder
+        let param = {
+            [folderName?.folder]: {}
+        }
+
+        const { data, error } = await supabase
+            .from('fileManager')
+            .insert([
+                { userId: session?.user?.id, folders: JSON.stringify(param) },
+            ])
+            .select()
+
+        
+    };
+    console.log(errors);
+
+
     return (
-        <div style={{
-           
-        }}>
+        <div >
+
+            <Dialog
+                open={open}
+                onClose={handleClose}
+               
+            >
+
+                    <DialogContent style={{ padding: '0px' }}>
+                <form onSubmit={handleSubmit(onSubmit)}>
+
+                        <Grid container style={{ minWidth: '600px', width: '40%' }}>
+
+                            <Grid item xs={12} style={{ padding: '18px 20px 10px' }}>
+                                <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '16px' }}>Create New Folder</Typography>
+
+                            </Grid>
+                        </Grid>
+                        <Divider style={{ margin: '10px 0' }} />
+
+                        <Grid container style={{ padding: '15px 20px' }}>
+
+                            <Grid item xs={12} >
+                                <input style={{ fontFamily: "var(--font-poppins)", border: "solid 1px #007aff", borderRadius: "10px", padding: "10px", width: 'calc(100% - 20px)' }} type="text" placeholder="folder" {...register("folder", { required: true })} />
+
+                            </Grid>
+                            <Grid item xs={12} style={{ padding: "0px", display: "flex", justifyContent: "flex-end", margin: "0px", fontSize: "12px" }}>
+                                {errors.Content && <p style={{ color: "red" }}>{errors.Content.message}</p>}
+                            </Grid>
+
+                            <Grid item xs={12} style={{ padding: '15px 0px 0px', display: 'flex', justifyContent:'flex-end' }}>
+
+                                <Button style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} onClick={handleClose}>Cancel</Button>
+                                <Button type="submit" variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Create</Button>
+
+
+                            </Grid>
+                        </Grid>
+
+                       
+                    </form>
+
+                    </DialogContent>
+                    
+
+            </Dialog>
+
             <StyledAppBar position="sticky" elevation={0} color=''>
                 <Toolbar>
                     <Box component="section" sx={{ p: { xs: 1, sm: 2, lg: 5 } }}></Box>
@@ -109,7 +241,7 @@ export default function Home() {
                                         alignItems: "center",
 
                                     }}>
-                                        
+
 
                                         <div>
                                             <Avatar sx={{ border: '2px solid #1976d2', width: 30, height: 30 }} alt="User" src={session?.user?.user_metadata?.avatar_url} />
@@ -140,33 +272,19 @@ export default function Home() {
                     <Box component="section" sx={{ p: { xs: 1, sm: 2, lg: 5 } }}></Box>
                 </Toolbar>
             </StyledAppBar >
-            <Container style={{padding:"15px"}}>
-                
+            <Container style={{ padding: "15px" }}>
+
 
                 <Grid container>
                     <Grid item container gap={2} xs={12}>
-                        <Grid item xs={3} >
-                            <div className={styles.card1} style={{ padding: "15px" }}>
-                                ABChghjsf fhsdfk jhsdfkjs dfhjdhf
-                                ABChghjsf fhsdfk jhsdfkjs dfhjdhf
-                                ABChghjsf fhsdfk jhsdfkjs dfhjdhf
-                                ABChghjsf fhsdfk jhsdfkjs dfhjdhf
-                                ABChghjsf fhsdfk jhsdfkjs dfhjdhf
+                        <Grid item xs={12}>
+                            <div className={styles.newFolderDiv}>
+                                <Button onClick={newFolder} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} startIcon={<AddRoundedIcon />}>
+                                    New Folder
+                                </Button>
                             </div>
-                        
                         </Grid>
-                        <Grid item xs={3} >
-                            <div className={styles.card1} style={{ padding: "15px" }}>
-                                ABChghjsf fhsdfk jhsdfkjs dfhjdhf
-                            </div>
 
-                        </Grid><Grid item xs={3} >
-                            <div className={styles.card1} style={{ padding: "15px" }}>
-                                ABChghjsf fhsdfk jhsdfkjs dfhjdhf
-                            </div>
-                        
-                        </Grid>
-                        
                     </Grid>
                 </Grid>
             </Container>
