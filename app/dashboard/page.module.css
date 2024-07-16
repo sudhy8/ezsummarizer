@@ -19,3 +19,24 @@
 #folderName{
   font-family: '__Poppins_e0630c';
 }
+.folderDiv{
+      width: 80px;
+        height: 80px;
+        /* border: solid 1px blue; */
+        display: flex;
+        flex-direction: column;
+       
+        align-content: center;
+        justify-content: center;
+        align-items: center;
+        
+        border-radius: 10px;
+        background: aliceblue;
+        padding: 10px;
+}
+.mainFolder{
+      display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: center;
+}
