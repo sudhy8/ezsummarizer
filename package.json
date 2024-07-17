@@ -11,6 +11,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@lottiefiles/dotlottie-react": "^0.7.2",
     "@mui/icons-material": "^5.16.1",
     "@mui/material": "^5.16.1",
     "@supabase/auth-ui-react": "^0.4.7",
@@ -20,6 +21,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.52.1",
+    "react-ripples": "^2.2.1",
     "react-toastify": "^10.0.5",
     "typewriter-effect": "^2.21.0"
   },
