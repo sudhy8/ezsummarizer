@@ -86,7 +86,7 @@ export default function Home() {
     const handleUpload = () => {
         setAudioLoader(true);
         setAudioLoaderStatus('Uploading file...');
-        const accessToken = process.env.DROPBOX_ACCESS_TOKEN; 
+        const accessToken = process.env.DROPBOX_ACCESS_TOKEN; // Replace with your access token
         const dbx = new Dropbox({ accessToken });
 
         const reader = new FileReader();
@@ -124,7 +124,7 @@ export default function Home() {
 
 
                         const client = new AssemblyAI({
-                           
+                            apiKey: "2bf1061ce19a48369e3adbabffdb0a44"
                         })
 
                         const audioUrl = modifyDropboxUrl(sharedLinkResponse?.result?.url);
