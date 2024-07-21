@@ -15,7 +15,6 @@
 
 const nextConfig = {
     env: {
-        
     },
     reactStrictMode: false,
 
