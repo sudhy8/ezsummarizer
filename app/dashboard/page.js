@@ -15,7 +15,6 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import { set, useForm } from 'react-hook-form';
 import Typewriter from '../TypingEffect';
-import CircularProgress from '@mui/material/CircularProgress';
 import Stack from '@mui/material/Stack';
 import ContentCopyTwoToneIcon from '@mui/icons-material/ContentCopyTwoTone';
 import { ToastContainer, toast } from 'react-toastify';
@@ -46,7 +45,11 @@ import Menu from '@mui/material/Menu';
 import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
 import MenuItem from '@mui/material/MenuItem';
 import { Dropbox } from 'dropbox';
+import CircularProgress, {
+    circularProgressClasses,
+} from '@mui/material/CircularProgress';
 
+import { AssemblyAI } from 'assemblyai'
 const folderIcon = <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="#0069ff" width="64px" height="64px"><path d="M 15.375 15 C 12.852469 15 10.787109 17.066423 10.787109 19.587891 L 10.787109 46.251953 C 10.787109 48.769711 11.338238 50.749451 12.6875 52.072266 C 14.036762 53.39508 16.013124 53.902344 18.470703 53.902344 L 48.324219 53.902344 C 50.188281 53.902344 51.707272 53.59715 52.890625 52.916016 C 54.073978 52.234881 54.870264 51.132805 55.166016 49.845703 C 56.442844 44.292168 56.280824 38.57964 56.257812 31.380859 C 56.257812 28.644179 54.07666 26.496842 51.460938 26.015625 A 1.0001 1.0001 0 0 0 51.279297 26 L 49.757812 26 C 49.676153 23.24049 47.421878 21 44.644531 21 L 33.257812 21 C 32.265487 21 31.364119 20.436916 30.929688 19.544922 L 29.974609 17.580078 C 29.208038 16.003496 27.603284 15 25.849609 15 L 15.375 15 z M 15.375 17 L 25.849609 17 C 26.841934 17 27.742353 17.563661 28.175781 18.455078 L 29.130859 20.419922 C 29.898428 21.995927 31.504139 23 33.257812 23 L 44.644531 23 C 46.335475 23 47.64211 24.331301 47.728516 26 L 26.554688 26 A 1.0001 1.0001 0 0 0 26.375 26.015625 C 23.758353 26.496793 21.578125 28.644483 21.578125 31.380859 C 21.577887 31.395359 21.533535 34.137681 21.361328 37.291016 C 21.188666 40.452676 20.834997 44.112156 20.416016 45.427734 A 1.0001 1.0001 0 0 0 20.416016 45.429688 C 19.818162 47.308163 18.905745 47.638151 18.244141 47.511719 C 17.582536 47.385286 16.787109 46.630599 16.787109 44.953125 L 16.787109 41 A 1.0001 1.0001 0 1 0 14.787109 41 L 14.787109 44.953125 C 14.787109 47.321651 16.086995 49.135995 17.869141 49.476562 C 19.651286 49.81713 21.531166 48.514681 22.320312 46.035156 C 22.930332 44.119735 23.182334 40.604527 23.357422 37.398438 C 23.53251 34.192347 23.578125 31.396484 23.578125 31.396484 A 1.0001 1.0001 0 0 0 23.578125 31.380859 C 23.578125 29.736031 24.94645 28.338764 26.707031 28 L 47.787109 28 L 47.787109 35.447266 A 1.0001 1.0001 0 1 0 49.787109 35.447266 L 49.787109 28 L 51.128906 28 C 52.888436 28.338728 54.257812 29.73634 54.257812 31.380859 A 1.0001 1.0001 0 0 0 54.257812 31.384766 C 54.280853 38.609967 54.417715 44.175074 53.216797 49.398438 C 53.029549 50.213335 52.645475 50.750228 51.892578 51.183594 C 51.139681 51.616959 49.964156 51.902344 48.324219 51.902344 L 18.470703 51.902344 C 16.286282 51.902344 14.919629 51.458014 14.087891 50.642578 C 13.256152 49.827143 12.787109 48.483195 12.787109 46.251953 L 12.787109 19.587891 C 12.787109 18.147358 13.933531 17 15.375 17 z" /></svg>
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -61,6 +64,8 @@ export default function Home() {
     const router = useRouter();
     const { register, reset, handleSubmit, formState: { errors } } = useForm();
     const [session, setSession] = useState(null)
+    const [audioTrans, setAudioTrans] = useState(null)
+    const [youtubeURL, setYoutubeURL] = useState('');
     const [open, setOpen] = React.useState(false);
     const [fileOpen, setFileOpen] = React.useState(false);
 
@@ -69,32 +74,131 @@ export default function Home() {
     const notify2 = () => toast.error("Recording Stopped!");
 
     const [file, setFile] = useState(null);
+    const [audioLoader, setAudioLoader] = useState(false);
+    const [audioLoaderStatus, setAudioLoaderStatus] = useState('');
+
+
 
     const handleFileChange = (event) => {
         setFile(event.target.files[0]);
     };
 
     const handleUpload = () => {
-        const accessToken = 'sl.B5YkJjo840ZDd6wlfzytJqRBCQDMiKXReijTCu9iBKwh63eZu9YHvColROrBsrdph_e-gTWB-uLpif-M5xI7HzLNNyiHN4T2-aBypq32ZiNBlW1dUjYwBX8hWQgQxCFmWWMGcXvjJa2ghBqqIjAGm9k'; // Replace with your access token
+        setAudioLoader(true);
+        setAudioLoaderStatus('Uploading file...');
+        const accessToken = process.env.DROPBOX_ACCESS_TOKEN; // Replace with your access token
         const dbx = new Dropbox({ accessToken });
 
         const reader = new FileReader();
         reader.onload = function (event) {
             const fileContent = event.target.result;
 
+            const fileName = file.name + new Date().getTime();
             dbx.filesUpload({
-                path: '/' + file.name,
+                path: '/' + fileName,
                 contents: fileContent
             })
                 .then((response) => {
                     console.log('File uploaded successfully:', response);
+
+                    // Create a shared link for the uploaded file
+                    return dbx.sharingCreateSharedLinkWithSettings({
+                        path: response.result.path_display
+                    });
+                })
+                .then((sharedLinkResponse) => {
+                    console.log('Shared link created:', sharedLinkResponse.result.url);
+                    // You can now use sharedLinkResponse.result.url as the link to the uploaded file
+                    console.log("file.type", file.type)
+                    if (file.type.includes('audio')) {
+                        console.log('File type is audio');
+
+                        function modifyDropboxUrl(url) {
+                            console.log("Getting url", url)
+                            if (url?.endsWith('dl=0')) {
+                                return url.slice(0, -4) + 'raw=1';
+                            } else {
+                                return url;
+                            }
+                        }
+
+
+                        const client = new AssemblyAI({
+                            apiKey: "2bf1061ce19a48369e3adbabffdb0a44"
+                        })
+
+                        const audioUrl = modifyDropboxUrl(sharedLinkResponse?.result?.url);
+
+                        const config = {
+                            audio_url: audioUrl
+                        }
+
+                        const run = async () => {
+                            setAudioLoaderStatus('Transcribing audio...');
+                            const transcript = await client.transcripts.transcribe(config)
+                            console.log(transcript.text)
+                            setAudioTrans(transcript.text)
+                            setAudioLoader(false);
+
+                        }
+
+                        run()
+
+
+
+                    }
+                    if (file.type.includes('video')) {
+                        console.log('File type is video');
+
+                        function modifyDropboxUrl(url) {
+                            console.log("Getting url", url)
+                            if (url?.endsWith('dl=0')) {
+                                return url.slice(0, -4) + 'raw=1';
+                            } else {
+                                return url;
+                            }
+                        }
+
+
+                        const client = new AssemblyAI({
+                            apiKey: "2bf1061ce19a48369e3adbabffdb0a44"
+                        })
+
+                        const audioUrl = modifyDropboxUrl(sharedLinkResponse?.result?.url);
+
+                        const config = {
+                            audio_url: audioUrl
+                        }
+
+                        const run = async () => {
+                            setAudioLoaderStatus('Transcribing audio...');
+                            const transcript = await client.transcripts.transcribe(config)
+                            console.log(transcript.text)
+                            setAudioTrans(transcript.text)
+                            setAudioLoader(false);
+
+                        }
+
+                        run()
+
+
+
+                    }
                 })
                 .catch((error) => {
-                    console.error('Error uploading file:', error);
+                    console.error('Error:', error);
+                    setAudioLoader(false);
                 });
         };
 
+
+
+
+
+
+
         reader.readAsArrayBuffer(file);
+        // setFileOpen(false)
     };
 
 
@@ -234,8 +338,50 @@ export default function Home() {
     };
     console.log(errors);
 
-    const searchYoutubeURL = () => { }
+    const searchYoutubeURL = () => { 
 
+        // Access the input element by its ID or use refs
+        const inputElement = document.getElementById('youtubeURLInput');
+
+        // Get the value from the input element
+        const url = inputElement.value;
+
+        // Regular expression to match YouTube video ID
+        // Example URLs:
+        // https://www.youtube.com/watch?v=dQw4w9WgXcQ
+        // https://youtu.be/dQw4w9WgXcQ
+        const regex = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+
+        const match = url.match(regex);
+
+        if (match) {
+            const videoId = match[1]; // Extracted video ID
+            console.log('YouTube Video ID:', videoId);
+            // You can also update state if you need to
+
+
+            fetchVideoData(videoId);
+            setYoutubeURL(videoId);
+        } else {
+            console.error('Invalid YouTube URL');
+            // Handle invalid URL case
+        }
+    }
+
+
+    const fetchVideoData = async (video) => {
+        try {
+            const response = await fetch(`https://ez-summarizer-youtube-caption-fetcher.vercel.app/content/${video}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            setVideoData(data);
+            console.log("audio",data);
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
 
     const [output, setOutput] = useState(['Recognized speech will appear here...']);
     const [isListening, setIsListening] = useState(false);
@@ -283,37 +429,46 @@ export default function Home() {
     };
 
 
-    const deleteFolder = (event,value) => {
+    const deleteFolder = (event, value) => {
         console.log("folder", value);
         event.stopPropagation();
     }
 
-    const handleFileClose = () => { 
+    const handleFileClose = () => {
         setFileOpen(false);
     }
-    
+
     return (
         <div >
 
-            
+
 
 
             <ToastContainer hideProgressBar={true} closeOnClick theme={"dark"} />
 
+          
+
+
             <Dialog
                 open={fileOpen}
                 onClose={handleFileClose}
+                PaperProps={{
+                    style: {
+                        width: '80vw',
+                        maxWidth: 'none', // To ensure it doesn't get constrained by default maxWidth
+                    },
+                }}
 
             >
 
-                <DialogContent style={{ padding: '0px' }}>
+                <DialogContent style={{ padding: '0px', width: '100%' }}>
 
 
-                    <Grid container style={{ minWidth: '600px', width: '40%' }}>
+                    <Grid container >
 
                         <Grid item xs={12} style={{ padding: '18px 20px 10px' }}>
                             <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '16px' }}>Upload your Video/Audio 🎥 </Typography>
-                            
+
 
                         </Grid>
                     </Grid>
@@ -322,19 +477,76 @@ export default function Home() {
                     <Grid container style={{ padding: '15px 20px' }}>
 
                         <Grid item xs={12} >
-                            <div className="output" style={{ maxHeight: '250px', overflow: 'auto' }}>
-                                <input type="file" onChange={handleFileChange} />
-                               
+                            <div className="output" style={{
+                                display: "flex",
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                maxHeight: '250px', overflow: 'auto'
+                            }}  >
+                                <div style={{ width: 'calc(100% - 120px)' }}>
+                                    <input type="file" onChange={handleFileChange} style={{
+
+                                        border: '1px solid #ccc',
+                                        display: 'inline-block',
+                                        padding: '12px 12px',
+                                        cursor: 'pointer',
+                                        backgroundColor: '#f8f9fa',
+                                        borderRadius: '4px',
+                                        fontSize: '16px',
+                                        width: '100%',
+                                        fontFamily: 'var(--font-poppins-bold)'
+                                    }} />
+                                </div>
+                                <div>
+                                    {!audioLoader && <Button onClick={handleUpload} disabled={isListening} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>
+                                        Upload</Button>}
+
+                                    {
+                                        audioLoader && <CircularProgress
+                                            style={{ marginLeft: '-50px' }}
+                                            size={24}
+                                            thickness={4}
+                                        />
+                                    }
+
+                                </div>
+
                             </div>
 
                         </Grid>
+                        <Grid item xs={12} style={{ padding: '15px 0px 0px', display: 'flex', justifyContent: 'flex-end' }}>
 
+                            {audioLoader && <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '14px' }}>{audioLoaderStatus}</Typography>
+                            }
+                            {/* <Button onClick={() => { setFileOpen(false) }} style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Cancel</Button> */}
+
+
+                        </Grid>
+                        {
+                            audioTrans &&
+                            <Grid item xs={12} >
+                                <Grid container >
+
+                                    <Grid item xs={12} style={{ padding: '18px 20px 10px' }}>
+                                        <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '16px' }}>Transcription 📜 </Typography>
+
+
+                                    </Grid>
+                                </Grid>
+                                <Divider style={{ margin: '10px 0' }} />
+                                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+
+                                    <Typewriter text={audioTrans || ''} delay={2} />
+
+                                </div>
+                            </Grid>
+                        }
 
                         <Grid item xs={12} style={{ padding: '15px 0px 0px', display: 'flex', justifyContent: 'flex-end' }}>
 
-                           
-                            <Button onClick={() => { setFileOpen(false) }}style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Cancel</Button>
-                            <Button onClick={handleUpload } disabled={isListening} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Upload</Button>
+
+                            <Button onClick={() => { setFileOpen(false) }} style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Cancel</Button>
+                            <Button onClick={handleUpload} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Summarize</Button>
 
 
                         </Grid>
@@ -364,8 +576,8 @@ export default function Home() {
 
                         <Grid item xs={12} style={{ padding: '18px 20px 10px' }}>
                             <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '16px' }}>Record Your Audio 🎙️ </Typography>
-                            {!isListening ? 
-                            
+                            {!isListening ?
+
                                 <DotLottieReact
                                     style={{ width: '40px', height: '40px', position: 'absolute', right: '20px', top: '10px' }}
                                     src="https://lottie.host/955ba6ae-14d0-4327-a199-4c86beaf5514/ZbkFMeTZPs.json"
@@ -378,8 +590,8 @@ export default function Home() {
                                     loop
                                     autoplay
                                 />
-                        }
-                            
+                            }
+
                         </Grid>
                     </Grid>
                     <Divider style={{ margin: '10px 0' }} />
@@ -387,13 +599,13 @@ export default function Home() {
                     <Grid container style={{ padding: '15px 20px' }}>
 
                         <Grid item xs={12} >
-                            <div className="output" style={{maxHeight:'250px',overflow:'auto'}}>
+                            <div className="output" style={{ maxHeight: '250px', overflow: 'auto' }}>
                                 {output.map((line, index) => (
                                     <Typewriter key={index} text={line} delay={30} />
                                     // <p key={index}>{line}</p>
                                 ))}
                             </div>
-                           
+
                         </Grid>
 
 
@@ -401,7 +613,7 @@ export default function Home() {
 
                             <Button onClick={() => { stopListening(); setAudioOpen(false); notify2() }} disabled={!isListening} style={{ color: "red", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Stop & Close</Button>
                             <Button onClick={() => { stopListening(); notify2() }} disabled={!isListening} style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Stop & Submit</Button>
-                            <Button onClick={() => { startListening(); notify()}} disabled={isListening} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Start Recording</Button>
+                            <Button onClick={() => { startListening(); notify() }} disabled={isListening} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Start Recording</Button>
 
 
                         </Grid>
@@ -536,6 +748,7 @@ export default function Home() {
                                     }}
                                     type="text"
                                     placeholder="youtubeURL"
+                                    id="youtubeURLInput"
                                 />
                                 <Button
                                     onClick={searchYoutubeURL}
@@ -570,14 +783,14 @@ export default function Home() {
                                     !isListening ?
 
                                         <MicRoundedIcon /> :
-                            <DotLottieReact
-                                style={{ width: '40px', height: '40px' }}
-                                src="https://lottie.host/c5b21150-1410-4c78-934c-8d5b27b00648/QQELoaLnYO.json"
-                                loop
-                                autoplay
-                            />
-                        
-                                    
+                                        <DotLottieReact
+                                            style={{ width: '40px', height: '40px' }}
+                                            src="https://lottie.host/c5b21150-1410-4c78-934c-8d5b27b00648/QQELoaLnYO.json"
+                                            loop
+                                            autoplay
+                                        />
+
+
 
 
                                 }>
@@ -597,9 +810,9 @@ export default function Home() {
                             display: 'flex',
                             justifyContent: 'center'
                         }}>
-                            <Button onClick={()=>setFileOpen(true)} variant="contained" style={{ width: '100%', background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} startIcon={<FileUploadRoundedIcon />}>
+                            <Button onClick={() => setFileOpen(true)} variant="contained" style={{ width: '100%', background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} startIcon={<FileUploadRoundedIcon />}>
                                 Upload
-                                
+
                             </Button>
                         </Grid>
 
@@ -621,7 +834,7 @@ export default function Home() {
                         <div className={styles.mainFolder}>
                             {
                                 files?.Home && Object.keys(files?.Home).map((folder) => {
-                                    return <div key={folder} style={{ margin: '10px', cursor: 'pointer',position:'relative' }}>
+                                    return <div key={folder} style={{ margin: '10px', cursor: 'pointer', position: 'relative' }}>
                                         <IconButton style={{
                                             position: 'absolute',
                                             top: '0px',
@@ -660,16 +873,16 @@ export default function Home() {
                                                     paddingTop: '0px',
                                                     paddingBottom: '0px',
                                                 },
-                                                
+
                                             }}
                                         >
-                                            <MenuItem style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 400,fontSize:'12px',margin:'0' }} onClick={morehandleClose}>Rename</MenuItem>
-                                            <MenuItem style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 400, fontSize: '12px', margin: '0' }} onClick={(event) => deleteFolder(event,folder)}>Delete</MenuItem>
+                                            <MenuItem style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 400, fontSize: '12px', margin: '0' }} onClick={morehandleClose}>Rename</MenuItem>
+                                            <MenuItem style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 400, fontSize: '12px', margin: '0' }} onClick={(event) => deleteFolder(event, folder)}>Delete</MenuItem>
 
                                         </Menu>
 
                                         <Ripples color="#ddefff" >
-                                           
+
                                             <div className={styles.folderDiv}>
                                                 <div>
                                                     {/* <img src="/folder.svg"  alt="folder" width="75" height="75" /> */}
@@ -682,7 +895,7 @@ export default function Home() {
                                                     <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '14px', color: "#0069ff" }}>{folder}</Typography>
 
                                                 </div>
-                                                
+
                                             </div>
 
                                         </Ripples>
@@ -700,7 +913,7 @@ export default function Home() {
                         </div>
 
 
-                        
+
 
 
                         {/* <p>{
