@@ -124,7 +124,7 @@ export default function Home() {
 
 
                         const client = new AssemblyAI({
-                            apiKey: "2bf1061ce19a48369e3adbabffdb0a44"
+                           
                         })
 
                         const audioUrl = modifyDropboxUrl(sharedLinkResponse?.result?.url);
