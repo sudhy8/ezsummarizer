@@ -52,6 +52,8 @@ import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 
 import { AssemblyAI } from 'assemblyai'
+const fileIcon = <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" width="100px" height="120px" stroke="#0069ff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+
 const folderIcon = <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="#0069ff" width="64px" height="64px"><path d="M 15.375 15 C 12.852469 15 10.787109 17.066423 10.787109 19.587891 L 10.787109 46.251953 C 10.787109 48.769711 11.338238 50.749451 12.6875 52.072266 C 14.036762 53.39508 16.013124 53.902344 18.470703 53.902344 L 48.324219 53.902344 C 50.188281 53.902344 51.707272 53.59715 52.890625 52.916016 C 54.073978 52.234881 54.870264 51.132805 55.166016 49.845703 C 56.442844 44.292168 56.280824 38.57964 56.257812 31.380859 C 56.257812 28.644179 54.07666 26.496842 51.460938 26.015625 A 1.0001 1.0001 0 0 0 51.279297 26 L 49.757812 26 C 49.676153 23.24049 47.421878 21 44.644531 21 L 33.257812 21 C 32.265487 21 31.364119 20.436916 30.929688 19.544922 L 29.974609 17.580078 C 29.208038 16.003496 27.603284 15 25.849609 15 L 15.375 15 z M 15.375 17 L 25.849609 17 C 26.841934 17 27.742353 17.563661 28.175781 18.455078 L 29.130859 20.419922 C 29.898428 21.995927 31.504139 23 33.257812 23 L 44.644531 23 C 46.335475 23 47.64211 24.331301 47.728516 26 L 26.554688 26 A 1.0001 1.0001 0 0 0 26.375 26.015625 C 23.758353 26.496793 21.578125 28.644483 21.578125 31.380859 C 21.577887 31.395359 21.533535 34.137681 21.361328 37.291016 C 21.188666 40.452676 20.834997 44.112156 20.416016 45.427734 A 1.0001 1.0001 0 0 0 20.416016 45.429688 C 19.818162 47.308163 18.905745 47.638151 18.244141 47.511719 C 17.582536 47.385286 16.787109 46.630599 16.787109 44.953125 L 16.787109 41 A 1.0001 1.0001 0 1 0 14.787109 41 L 14.787109 44.953125 C 14.787109 47.321651 16.086995 49.135995 17.869141 49.476562 C 19.651286 49.81713 21.531166 48.514681 22.320312 46.035156 C 22.930332 44.119735 23.182334 40.604527 23.357422 37.398438 C 23.53251 34.192347 23.578125 31.396484 23.578125 31.396484 A 1.0001 1.0001 0 0 0 23.578125 31.380859 C 23.578125 29.736031 24.94645 28.338764 26.707031 28 L 47.787109 28 L 47.787109 35.447266 A 1.0001 1.0001 0 1 0 49.787109 35.447266 L 49.787109 28 L 51.128906 28 C 52.888436 28.338728 54.257812 29.73634 54.257812 31.380859 A 1.0001 1.0001 0 0 0 54.257812 31.384766 C 54.280853 38.609967 54.417715 44.175074 53.216797 49.398438 C 53.029549 50.213335 52.645475 50.750228 51.892578 51.183594 C 51.139681 51.616959 49.964156 51.902344 48.324219 51.902344 L 18.470703 51.902344 C 16.286282 51.902344 14.919629 51.458014 14.087891 50.642578 C 13.256152 49.827143 12.787109 48.483195 12.787109 46.251953 L 12.787109 19.587891 C 12.787109 18.147358 13.933531 17 15.375 17 z" /></svg>
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -71,8 +73,15 @@ export default function Home() {
     const [open, setOpen] = React.useState(false);
     const [captionOpen, setCaptionOpen] = React.useState(false);
     const [fileOpen, setFileOpen] = React.useState(false);
+    const [previewOpen, setPreviewOpen] = React.useState(false);
+    const [selectedOut, setselectedOut] = React.useState({});
+
     const [captions, setCaptions] = React.useState({});
     const [captionTexts, setCaptionTexts] = useState([]);
+    const [summary, setSummary] = useState(null);
+    const [summaryLoading, setSummaryLoading] = useState(false);
+
+
 
     const [audioOpen, setAudioOpen] = React.useState(false);
     const notify = () => toast.success("Recording Started...!");
@@ -83,12 +92,26 @@ export default function Home() {
     const [audioLoaderStatus, setAudioLoaderStatus] = useState('');
 
 
+    function modifyDropboxUrl(url) {
+        console.log("Getting url", url)
+        if (url?.endsWith('dl=0')) {
+
+
+            return url.slice(0, -4) + 'raw=1';
+        } else {
+            return url;
+        }
+    }
+
 
     const handleFileChange = (event) => {
         setFile(event.target.files[0]);
     };
 
-    const handleUpload = () => {
+    const handleUpload = async () => {
+
+
+
         setAudioLoader(true);
         setAudioLoaderStatus('Uploading file...');
         const accessToken = process.env.DROPBOX_ACCESS_TOKEN; // Replace with your access token
@@ -98,7 +121,7 @@ export default function Home() {
         reader.onload = function (event) {
             const fileContent = event.target.result;
 
-            const fileName = file.name + new Date().getTime();
+            const fileName = new Date().getTime() + "__" + file.name;
             dbx.filesUpload({
                 path: '/' + fileName,
                 contents: fileContent
@@ -118,14 +141,7 @@ export default function Home() {
                     if (file.type.includes('audio')) {
                         console.log('File type is audio');
 
-                        function modifyDropboxUrl(url) {
-                            console.log("Getting url", url)
-                            if (url?.endsWith('dl=0')) {
-                                return url.slice(0, -4) + 'raw=1';
-                            } else {
-                                return url;
-                            }
-                        }
+                        
 
 
                         const client = new AssemblyAI({
@@ -144,6 +160,52 @@ export default function Home() {
                             console.log(transcript.text)
                             setAudioTrans(transcript.text)
                             setAudioLoader(false);
+
+                           
+
+                            console.log("------", {
+                                folder: selectedFolderName,
+                                files: files,
+                                selectedFolder: selectedFolder,
+                            })
+                            let temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { url: sharedLinkResponse?.result?.url,type:'video', }] }
+                            setSelectedFolder(temp)
+                            console.log("temp", temp)
+
+                            callSummarizeAPI(transcript.text, { type: 'customaudio',url:sharedLinkResponse?.result?.url });
+// JJJJ
+                            // if (selectedFolderName === 'Home') {
+
+                            //     setFiles({ ...files, [selectedFolderName]: temp })
+                            //     console.log("files", files)
+
+                            //     const { data, error } = await supabase
+                            //         .from('fileManager')
+                            //         .update([{ userId: session?.user?.id, folders: JSON.stringify({ ...files, [selectedFolderName]: temp }) }])
+                            //         .eq('userId', session?.user?.id)
+                            //         .select()
+                            // }
+                            // else {
+                            //     let param = {
+                            //         "Home": {
+                            //             ...files['Home'],
+                            //             [selectedFolderName]: temp
+
+                            //         }
+                            //     }
+
+
+                            //     setFiles({ ...files, [selectedFolderName]: temp })
+                            //     console.log("files", files)
+
+                            //     const { data, error } = await supabase
+                            //         .from('fileManager')
+                            //         .update([{ userId: session?.user?.id, folders: JSON.stringify(param) }])
+                            //         .eq('userId', session?.user?.id)
+                            //         .select()
+                            // }
+
+
 
                         }
 
@@ -182,6 +244,19 @@ export default function Home() {
                             setAudioTrans(transcript.text)
                             setAudioLoader(false);
 
+
+                            console.log("------", {
+                                folder: selectedFolderName,
+                                files: files,
+                                selectedFolder: selectedFolder,
+                            })
+                            let temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { url: sharedLinkResponse?.result?.url, type: 'video', }] }
+                            setSelectedFolder(temp)
+                            console.log("temp", temp)
+
+                            callSummarizeAPI(transcript.text, { type: 'customvideo', url: sharedLinkResponse?.result?.url });
+                            // JJJJ
+
                         }
 
                         run()
@@ -208,6 +283,10 @@ export default function Home() {
 
 
     const [files, setFiles] = React.useState({});
+    const [selectedFolder, setSelectedFolder] = React.useState(null);
+    const [selectedFolderName, setSelectedFolderName] = React.useState(null);
+
+
     const [anchorEl, setAnchorEl] = React.useState(null);
     const openMore = Boolean(anchorEl);
     const morehandleClick = (event) => {
@@ -236,7 +315,9 @@ export default function Home() {
         }
         else {
             let param = {
-                Home: {}
+                Home: {
+                    "__uplodedFiles__": []
+                }
             }
 
             const { data, error } = await supabase
@@ -247,10 +328,22 @@ export default function Home() {
                 .select()
 
 
-            setFiles({ Home: {} })
+            setFiles({
+                Home: {
+                    "__uplodedFiles__": []
+                }
+})
         }
 
+
+
     }
+
+    useEffect(() => {
+        setSelectedFolder(files?.Home)
+        setSelectedFolderName('Home')
+    }, [files])
+
 
 
     useEffect(() => {
@@ -263,6 +356,10 @@ export default function Home() {
 
     const handleClickOpen = () => {
         setOpen(true);
+    };
+
+    const handlePreviewClose = () => {
+        setPreviewOpen(false);
     };
 
     const handleClose = () => {
@@ -321,7 +418,9 @@ export default function Home() {
         let param = {
             Home: {
                 ...files.Home,
-                [name]: {}
+                [name]: {
+                    "__uplodedFiles__": []
+                }
             },
 
         }
@@ -343,7 +442,16 @@ export default function Home() {
     };
     console.log(errors);
 
-    const searchYoutubeURL = () => { 
+    const addFile = async () => {
+        console.log("file", files?.Home);
+        // const { data, error } = await supabase
+        //     .from('fileManager')
+        //     .update([{ userId: session?.user?.id, folders: JSON.stringify(param) }])
+        //     .eq('userId', session?.user?.id)
+        //     .select()
+    }
+
+    const searchYoutubeURL = () => {
         setCaptionOpen(true);
 
         // Access the input element by its ID or use refs
@@ -407,7 +515,7 @@ export default function Home() {
         if (captions?.captions && Array.isArray(captions?.captions)) {
             // Extract text from each caption object
             let texts = "";
-            texts = texts+ captions?.captions?.map(caption => caption?.text);
+            texts = texts + captions?.captions?.map(caption => caption?.text);
             setCaptionTexts(texts);
             console.log("Extracted caption texts:", texts);
         } else {
@@ -415,7 +523,7 @@ export default function Home() {
         }
 
     }, [captions])
-    
+
     const [output, setOutput] = useState(['Recognized speech will appear here...']);
     const [isListening, setIsListening] = useState(false);
     const recognitionRef = useRef(null);
@@ -458,13 +566,16 @@ export default function Home() {
     const stopListening = () => {
         setIsListening(false);
         recognitionRef.current.stop();
-        setOutput(prevOutput => [...prevOutput, 'Stopped listening.']);
+        setOutput(prevOutput => [...prevOutput, '']);
+        console.log("output", output.join(''))
+        callSummarizeAPI(output.join(''), { type: 'audio' });
     };
 
 
     const deleteFolder = (event, value) => {
-        console.log("folder", value);
         event.stopPropagation();
+
+        console.log("folder", value);
     }
 
     const handleFileClose = () => {
@@ -475,15 +586,239 @@ export default function Home() {
         setCaptionOpen(false);
     }
 
+    const clickedFolder = (folder) => {
+        console.log("folder", folder);
+        console.log("files", files);
+        console.log("files['Home'].folder", files?.['Home']);
+        console.log("files['Home'].folder", files?.['Home']?.[folder]);
+        console.log("files['Home'].folder", files?.['Home']?.[folder]?.__uplodedFiles__);
+        console.log("selectedFolder", selectedFolder);
+
+
+        if (selectedFolder) {
+            setSelectedFolder(files?.['Home']?.[folder]);
+            setSelectedFolderName(folder);
+            console.log("selectedFolder0000000", files?.folder);
+            console.log("selectedFolder0000000", folder);
+
+
+        } else {
+            setSelectedFolder(files?.['Home']?.[folder]);
+            selectedFolderName(folder);
+            debugger;
+            console.log("selectedFolder", files?.['Home']?.[folder]);
+            console.log("selectedFolder0000000", folder);
+
+        }
+
+    }
+    function getFirstFiveAlphabets(text="Document") {
+        // // Filter out non-alphabetic characters
+        // let alphabeticChars = text.split('').filter(char => /[a-zA-Z]/.test(char));
+
+        // // Get the first five alphabetic characters
+        let firstFive = text.slice(0, 5);
+
+        return firstFive+"..." || "Document";
+    }
+
+
+    const apiUrl = 'http://20.151.83.246:8000/summarize';
+    // Function to call the API
+    async function callSummarizeAPI(captionTexts,param={type:'default'}) {
+        setSummaryLoading(true)
+        try {
+            // Make the POST request
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({"text":captionTexts})
+            });
+
+            // Check if the request was successful
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Parse the JSON response
+            const data = await response.json();
+            console.log('Summarized Text:', data?.summary);
+            setSummary(data?.summary);
+            setSummaryLoading(false)
+
+
+            let temp = {}
+            console.log("selectedFolderName-selectedFolderName", selectedFolderName)
+            if (param?.type === 'youtube') { 
+
+                temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { summary: data?.summary, type: 'youtube', raw: captionTexts, url: youtubeURL }] }
+            }
+            if (param?.type === 'audio') {
+
+                temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { summary: data?.summary, type: 'audio', raw: captionTexts}] }
+            }
+            if (param?.type === 'customaudio' || param?.type === 'customvideo') {
+
+                temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { summary: data?.summary, type: param?.type, url: param?.url, raw: captionTexts }] }
+            }
+            
+          
+                
+              
+            
+            if (selectedFolderName === 'Home') {
+
+                setFiles({ ...files, [selectedFolderName]: temp })
+                console.log("files", files)
+
+                const { data, error } = await supabase
+                    .from('fileManager')
+                    .update([{ userId: session?.user?.id, folders: JSON.stringify({ ...files, [selectedFolderName]: temp }) }])
+                    .eq('userId', session?.user?.id)
+                    .select()
+            }
+            else {
+                let param = {
+                    "Home": {
+                        ...files['Home'],
+                        [selectedFolderName]: temp
+
+                    }
+                }
+
+
+                setFiles({ ...files, [selectedFolderName]: temp })
+                console.log("files", files)
+
+                const { data, error } = await supabase
+                    .from('fileManager')
+                    .update([{ userId: session?.user?.id, folders: JSON.stringify(param) }])
+                    .eq('userId', session?.user?.id)
+                    .select()
+            }
+
+
+
+        } catch (error) {
+            console.error('Error:', error);
+            setSummaryLoading(false)
+
+        }
+
+
+    }
+
+    const captionSummarize = () => {
+        console.log("captionTexts", captionTexts);
+        callSummarizeAPI(captionTexts,{type:'youtube'});
+
+       
+    }
     return (
         <div >
 
+            <Dialog
+                open={previewOpen}
+                onClose={handlePreviewClose}
+                PaperProps={{
+                    style: {
+                        width: '80vw',
+                        maxWidth: 'none', // To ensure it doesn't get constrained by default maxWidth
+                    },
+                }}
+
+            >
+
+                <DialogContent style={{ padding: '0px', width: '100%' }}>
+
+
+                    <Grid container >
+
+                        <Grid item xs={12} style={{ padding: '18px 20px 10px' }}>
+                            <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '16px' }}>Preview </Typography>
+
+
+                        </Grid>
+                    </Grid>
+                    <Divider style={{ margin: '10px 0' }} />
+
+                    <Grid container style={{ padding: '15px 20px' }}>
+
+                        <Grid item xs={12} >
+                          
+                                <div>
+                                    
+                                {
+                                selectedOut?.type === 'youtube' ?
+                                <iframe width="100%" height="315"
+                                    src={`https://www.youtube.com/embed/${selectedOut?.url}`}
+                                    frameborder="0"
+                                    allow="autoplay; encrypted-media"
+                                    allowfullscreen>
+                                </iframe>:<></>
+                                }
+                                
+                                {
+                                    selectedOut?.type === 'customaudio' ?
+                                    <video width="100%" style={{height:'60px',maxHeight:'100%'}} controls>
+                                            <source src={modifyDropboxUrl(selectedOut?.url)} type="video/mp4" /></video>:<></>
+                                }
+
+
+                                {
+                                    selectedOut?.type === 'customvideo' ?
+                                        <video width="100%" controls>
+                                            <source src={modifyDropboxUrl(selectedOut?.url)} type="video/mp4" /></video> : <></>
+                                }
+                                
+                                <div>
+                                    <h2>Summary</h2>
+                                    <p>{selectedOut?.summary}</p>
+                                </div>
+                                <div>
+                                    <h2>Raw Data</h2>
+                                    <p>{selectedOut?.raw}</p>
+                                </div>
+                                
+                                </div>
+                            
+
+                            
+                            
+
+                        </Grid>
+                        
+                       
+
+                        <Grid item xs={12} style={{ padding: '15px 0px 0px', display: 'flex', justifyContent: 'flex-end' }}>
+
+
+                            <Button onClick={() => { setPreviewOpen(false) }} style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Close</Button>
+                          
+
+
+
+                        </Grid>
+                    </Grid>
+
+
+
+
+                </DialogContent>
+
+
+            </Dialog>
+
+
+            
 
 
 
             <ToastContainer hideProgressBar={true} closeOnClick theme={"dark"} />
 
-          
+
             <Dialog
                 open={captionOpen}
                 onClose={handleCaptionClose}
@@ -512,13 +847,21 @@ export default function Home() {
                     <Grid container style={{ padding: '15px 20px' }}>
 
                         <Grid item xs={12} >
+                            {
+                                summary &&
+                                <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                                    <p style={{fontWeight:'500',fontSize:"17px"}}>Summary</p>
+                                    {summary}
+                                </div>
+                            }
+                            
                             <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
                                 <JsonView src={captions} />
 
                             </div>
-                            <div style={{height:'250px',overflowY:'auto'}}>
+                            <div style={{ height: '250px', overflowY: 'auto' }}>
                                 {captionTexts}
-                           </div>
+                            </div>
 
                         </Grid>
                         <Grid item xs={12} style={{ padding: '15px 0px 0px', display: 'flex', justifyContent: 'flex-end' }}>
@@ -530,9 +873,10 @@ export default function Home() {
 
                         </Grid>
                         {
-                            audioTrans &&
+                            audioTrans && !summary &&
                             <Grid item xs={12} >
-                                <Grid container >
+                                    <Grid container >
+                                        
 
                                     <Grid item xs={12} style={{ padding: '18px 20px 10px' }}>
                                         <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '16px' }}>Transcription 📜 </Typography>
@@ -553,7 +897,17 @@ export default function Home() {
 
 
                             <Button onClick={() => { setFileOpen(false) }} style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Cancel</Button>
-                            <Button onClick={handleUpload} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Summarize</Button>
+                            {
+                                !summary ? <Button onClick={() => captionSummarize()} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>
+                                    {
+                                        summaryLoading ? <CircularProgress style={{ width: '20px', height: '20px' }} /> : "Summarize"
+
+                                    }
+
+
+                                </Button> : <></>
+                            }
+                            
 
 
                         </Grid>
@@ -646,6 +1000,25 @@ export default function Home() {
 
                         </Grid>
                         {
+                            summary &&
+                            <Grid item xs={12} >
+                                <Grid container >
+
+                                    <Grid item xs={12} style={{ padding: '18px 20px 10px' }}>
+                                        <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '16px' }}>Summary </Typography>
+
+
+                                    </Grid>
+                                </Grid>
+                                <Divider style={{ margin: '10px 0' }} />
+                                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+
+                                    <Typewriter text={summary || ''} delay={2} />
+
+                                </div>
+                            </Grid>
+                        }
+                        {
                             audioTrans &&
                             <Grid item xs={12} >
                                 <Grid container >
@@ -668,8 +1041,8 @@ export default function Home() {
                         <Grid item xs={12} style={{ padding: '15px 0px 0px', display: 'flex', justifyContent: 'flex-end' }}>
 
 
-                            <Button onClick={() => { setFileOpen(false) }} style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Cancel</Button>
-                            <Button onClick={handleUpload} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Summarize</Button>
+                            {/* <Button onClick={() => { setFileOpen(false) }} style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Cancel</Button>
+                            <Button onClick={handleUpload} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Summarize</Button> */}
 
 
                         </Grid>
@@ -955,8 +1328,9 @@ export default function Home() {
                     </Grid>
                     <Grid item xs={12}>
                         <div className={styles.mainFolder}>
+
                             {
-                                files?.Home && Object.keys(files?.Home).map((folder) => {
+                                selectedFolder && Object.keys(selectedFolder).filter(folder => folder !== '__uplodedFiles__').map((folder) => {
                                     return <div key={folder} style={{ margin: '10px', cursor: 'pointer', position: 'relative' }}>
                                         <IconButton style={{
                                             position: 'absolute',
@@ -1006,16 +1380,19 @@ export default function Home() {
 
                                         <Ripples color="#ddefff" >
 
-                                            <div className={styles.folderDiv}>
+                                            <div className={styles.folderDiv} onClick={() => clickedFolder(folder)}>
                                                 <div>
-                                                    {/* <img src="/folder.svg"  alt="folder" width="75" height="75" /> */}
+
                                                     <svg width={60} height={60}>
                                                         {folderIcon}
                                                     </svg>
                                                 </div>
                                                 <div>
 
-                                                    <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '14px', color: "#0069ff" }}>{folder}</Typography>
+                                                    <Typography variant="p" component="div" style={{
+                                                        whiteSpace: "nowrap",
+                                                        overflow: "hidden",
+                                                        textOverflow: "ellipsis",fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '14px', color: "#0069ff" }}>{folder}</Typography>
 
                                                 </div>
 
@@ -1033,10 +1410,50 @@ export default function Home() {
 
                                 })
                             }
+
+
+
+                           
+
+
                         </div>
 
 
+                        <div>
+                            {selectedFolder?.__uplodedFiles__
+                                && selectedFolder?.__uplodedFiles__
+                                    ?.length > 0 && (
+                                <div className="uploaded-files-section" style={{ display: 'flex' }}>
 
+                                        {selectedFolder.__uplodedFiles__
+                                            .map((file, index) => (
+                                                <div  key={index} style={{ margin: '10px', cursor: 'pointer', position: 'relative', width:'100px' }}>
+
+
+
+                                                    <Ripples color="#ddefff" >
+
+                                                        <div onClick={() => { setPreviewOpen(true); setselectedOut(file) }} className={styles.folderDiv} >
+                                                            <div>
+
+                                                                <svg width={40} height={60}>
+                                                                    {fileIcon}
+                                                                </svg>
+                                                            </div>
+                                                            <div>
+
+                                                                <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '14px', color: "#0069ff" }}>{getFirstFiveAlphabets(file?.raw)}</Typography>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </Ripples>
+                                                </div>
+                                            ))}
+                                    </div>
+                                )}
+</div>
 
 
                         {/* <p>{

@@ -7,7 +7,7 @@ const nextConfig = {
         DROPBOX_CLIENT_ID: 'nmotgy9ip4h9evc',
         DROPBOX_CLIENT_SECRET: '8ukac8t0fzyh68z',
         DROPBOX_REFRESH_TOKEN: '8veR7yVbibYAAAAAAAAAX_4AK0GSlrdktwvfLwDgRv0',
-        DROPBOX_ACCESS_TOKEN: 'sl.B5cyBGj6nDf8IotXnq8UyE1Ra5GvPX43Jbf2TYapN3p9sMioTqh-2-pTw5cII7Nikl_ZIAx5KBr4xCtWF0ns-v3geGQs6GhFdaXE51mdr63lcXsrySdyMlqkrIDg5y3nLwadt_rVtbsX8NeiW2OkUy0'
+        DROPBOX_ACCESS_TOKEN: 'sl.B6acJ98V-weJwjtwOWB8yaU5ASOMGijwildUjFZ515_OyzYAJG_tC3_e7NDmALXSVC1KVv_YcSIWMEvI_cLhBN6nTpnQbJklbypxBLXrRlaMo9RfpuRYdE8lbCWEw-rqv7XPd976jaLPojQtNeQb2cI'
     },
     reactStrictMode: false,
 
