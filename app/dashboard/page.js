@@ -236,7 +236,7 @@ export default function Home() {
                         const config = {
                             audio_url: audioUrl
                         }
-
+   
                         const run = async () => {
                             setAudioLoaderStatus('Transcribing audio...');
                             const transcript = await client.transcripts.transcribe(config)
