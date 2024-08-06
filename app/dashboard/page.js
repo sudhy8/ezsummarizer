@@ -80,6 +80,8 @@ export default function Home() {
     const [captionTexts, setCaptionTexts] = useState([]);
     const [summary, setSummary] = useState(null);
     const [summaryLoading, setSummaryLoading] = useState(false);
+    const [textSummaryOpen, setTextSummaryOpen] = useState(false);
+
 
 
 
@@ -107,6 +109,24 @@ export default function Home() {
     const handleFileChange = (event) => {
         setFile(event.target.files[0]);
     };
+
+
+    const [textContent, setTextContent] = useState('');
+
+    const handleTextChange = (event) => {
+        setTextContent(event.target.value);
+    };
+
+    const sumbitText = () => {
+        // Use textContent here for your summarization logic
+        console.log('Text to summarize:', textContent);
+        // Add your summarization logic here
+
+
+        callSummarizeAPI(textContent, { type: 'text' });
+    };
+
+
 
     const handleUpload = async () => {
 
@@ -141,7 +161,7 @@ export default function Home() {
                     if (file.type.includes('audio')) {
                         console.log('File type is audio');
 
-                        
+
 
 
                         const client = new AssemblyAI({
@@ -161,19 +181,19 @@ export default function Home() {
                             setAudioTrans(transcript.text)
                             setAudioLoader(false);
 
-                           
+
 
                             console.log("------", {
                                 folder: selectedFolderName,
                                 files: files,
                                 selectedFolder: selectedFolder,
                             })
-                            let temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { url: sharedLinkResponse?.result?.url,type:'video', }] }
+                            let temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { url: sharedLinkResponse?.result?.url, type: 'video', }] }
                             setSelectedFolder(temp)
                             console.log("temp", temp)
 
-                            callSummarizeAPI(transcript.text, { type: 'customaudio',url:sharedLinkResponse?.result?.url });
-// JJJJ
+                            callSummarizeAPI(transcript.text, { type: 'customaudio', url: sharedLinkResponse?.result?.url });
+                            // JJJJ
                             // if (selectedFolderName === 'Home') {
 
                             //     setFiles({ ...files, [selectedFolderName]: temp })
@@ -236,7 +256,7 @@ export default function Home() {
                         const config = {
                             audio_url: audioUrl
                         }
-   
+
                         const run = async () => {
                             setAudioLoaderStatus('Transcribing audio...');
                             const transcript = await client.transcripts.transcribe(config)
@@ -332,7 +352,7 @@ export default function Home() {
                 Home: {
                     "__uplodedFiles__": []
                 }
-})
+            })
         }
 
 
@@ -440,6 +460,10 @@ export default function Home() {
 
 
     };
+
+    const onSubmit2 = async (data) => {
+        console.log("data", data)
+    }
     console.log(errors);
 
     const addFile = async () => {
@@ -612,20 +636,20 @@ export default function Home() {
         }
 
     }
-    function getFirstFiveAlphabets(text="Document") {
+    function getFirstFiveAlphabets(text = "Document") {
         // // Filter out non-alphabetic characters
         // let alphabeticChars = text.split('').filter(char => /[a-zA-Z]/.test(char));
 
         // // Get the first five alphabetic characters
         let firstFive = text.slice(0, 5);
 
-        return firstFive+"..." || "Document";
+        return firstFive + "..." || "Document";
     }
 
 
     const apiUrl = 'http://20.151.83.246:8000/summarize';
     // Function to call the API
-    async function callSummarizeAPI(captionTexts,param={type:'default'}) {
+    async function callSummarizeAPI(captionTexts, param = { type: 'default' }) {
         setSummaryLoading(true)
         try {
             // Make the POST request
@@ -634,7 +658,7 @@ export default function Home() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({"text":captionTexts})
+                body: JSON.stringify({ "text": captionTexts })
             });
 
             // Check if the request was successful
@@ -651,23 +675,26 @@ export default function Home() {
 
             let temp = {}
             console.log("selectedFolderName-selectedFolderName", selectedFolderName)
-            if (param?.type === 'youtube') { 
+            if (param?.type === 'youtube') {
 
                 temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { summary: data?.summary, type: 'youtube', raw: captionTexts, url: youtubeURL }] }
             }
             if (param?.type === 'audio') {
 
-                temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { summary: data?.summary, type: 'audio', raw: captionTexts}] }
+                temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { summary: data?.summary, type: 'audio', raw: captionTexts }] }
             }
             if (param?.type === 'customaudio' || param?.type === 'customvideo') {
 
                 temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { summary: data?.summary, type: param?.type, url: param?.url, raw: captionTexts }] }
             }
-            
-          
-                
-              
-            
+            if (param?.type === 'text') {
+
+                temp = { ...selectedFolder, __uplodedFiles__: [...selectedFolder?.__uplodedFiles__, { summary: data?.summary, type: param?.type,raw: captionTexts }] }
+            }
+
+
+
+
             if (selectedFolderName === 'Home') {
 
                 setFiles({ ...files, [selectedFolderName]: temp })
@@ -712,12 +739,93 @@ export default function Home() {
 
     const captionSummarize = () => {
         console.log("captionTexts", captionTexts);
-        callSummarizeAPI(captionTexts,{type:'youtube'});
+        callSummarizeAPI(captionTexts, { type: 'youtube' });
 
-       
+
+    }
+
+    const handleTextSummaryOpenClose = () => {
+        setTextSummaryOpen(false);
     }
     return (
         <div >
+
+            <Dialog
+                open={textSummaryOpen}
+                onClose={handleTextSummaryOpenClose}
+                PaperProps={{
+                    style: {
+                        width: '80vw',
+                        maxWidth: 'none', // To ensure it doesn't get constrained by default maxWidth
+                    },
+                }}
+
+            >
+
+                <DialogContent style={{ padding: '0px', width: '100%' }}>
+
+
+                    <Grid container >
+
+                        <Grid item xs={12} style={{ padding: '18px 20px 10px' }}>
+                            <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '16px' }}>Text Summary </Typography>
+
+
+                        </Grid>
+                    </Grid>
+                    <Divider style={{ margin: '10px 0' }} />
+
+                    <Grid container style={{ padding: '15px 20px' }}>
+                        {
+                            summary &&
+                            <Grid item xs={12} >
+                                <Grid container >
+
+                                    <Grid item xs={12} style={{ padding: '18px 20px 10px' }}>
+                                        <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '16px' }}>Summary </Typography>
+
+
+                                    </Grid>
+                                </Grid>
+                                <Divider style={{ margin: '10px 0' }} />
+                                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+
+                                    <Typewriter text={summary || ''} delay={2} />
+
+                                    </div>
+                                    <Box component="section" sx={{ p: { xs: 1, sm: 2, lg: 5 } }}></Box>
+
+                            </Grid>
+                        }
+
+
+                        <textarea rows="10" value={textContent}
+                            onChange={handleTextChange} style={{ fontFamily: "var(--font-poppins)", width: "-webkit-fill-available", border: "solid 1px #007aff", borderRadius: "10px", padding: "10px" }} />
+
+                        <Grid item xs={12} style={{ padding: '15px 0px 0px', display: 'flex', justifyContent: 'flex-end' }}>
+
+
+                            <Button onClick={() => { setTextSummaryOpen(false) }} style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Close</Button>
+
+                            <Button onClick={() => sumbitText()} style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Summarize</Button>
+
+
+
+                        </Grid>
+                    </Grid>
+
+
+
+
+
+                </DialogContent>
+
+
+            </Dialog>
+
+
+
+
 
             <Dialog
                 open={previewOpen}
@@ -747,23 +855,23 @@ export default function Home() {
                     <Grid container style={{ padding: '15px 20px' }}>
 
                         <Grid item xs={12} >
-                          
-                                <div>
-                                    
+
+                            <div>
+
                                 {
-                                selectedOut?.type === 'youtube' ?
-                                <iframe width="100%" height="315"
-                                    src={`https://www.youtube.com/embed/${selectedOut?.url}`}
-                                    frameborder="0"
-                                    allow="autoplay; encrypted-media"
-                                    allowfullscreen>
-                                </iframe>:<></>
+                                    selectedOut?.type === 'youtube' ?
+                                        <iframe width="100%" height="315"
+                                            src={`https://www.youtube.com/embed/${selectedOut?.url}`}
+                                            frameborder="0"
+                                            allow="autoplay; encrypted-media"
+                                            allowfullscreen>
+                                        </iframe> : <></>
                                 }
-                                
+
                                 {
                                     selectedOut?.type === 'customaudio' ?
-                                    <video width="100%" style={{height:'60px',maxHeight:'100%'}} controls>
-                                            <source src={modifyDropboxUrl(selectedOut?.url)} type="video/mp4" /></video>:<></>
+                                        <video width="100%" style={{ height: '60px', maxHeight: '100%' }} controls>
+                                            <source src={modifyDropboxUrl(selectedOut?.url)} type="video/mp4" /></video> : <></>
                                 }
 
 
@@ -772,7 +880,7 @@ export default function Home() {
                                         <video width="100%" controls>
                                             <source src={modifyDropboxUrl(selectedOut?.url)} type="video/mp4" /></video> : <></>
                                 }
-                                
+
                                 <div>
                                     <h2>Summary</h2>
                                     <p>{selectedOut?.summary}</p>
@@ -781,22 +889,22 @@ export default function Home() {
                                     <h2>Raw Data</h2>
                                     <p>{selectedOut?.raw}</p>
                                 </div>
-                                
-                                </div>
-                            
 
-                            
-                            
+                            </div>
+
+
+
+
 
                         </Grid>
-                        
-                       
+
+
 
                         <Grid item xs={12} style={{ padding: '15px 0px 0px', display: 'flex', justifyContent: 'flex-end' }}>
 
 
                             <Button onClick={() => { setPreviewOpen(false) }} style={{ color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}>Close</Button>
-                          
+
 
 
 
@@ -812,7 +920,7 @@ export default function Home() {
             </Dialog>
 
 
-            
+
 
 
 
@@ -850,11 +958,11 @@ export default function Home() {
                             {
                                 summary &&
                                 <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
-                                    <p style={{fontWeight:'500',fontSize:"17px"}}>Summary</p>
+                                    <p style={{ fontWeight: '500', fontSize: "17px" }}>Summary</p>
                                     {summary}
                                 </div>
                             }
-                            
+
                             <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
                                 <JsonView src={captions} />
 
@@ -875,8 +983,8 @@ export default function Home() {
                         {
                             audioTrans && !summary &&
                             <Grid item xs={12} >
-                                    <Grid container >
-                                        
+                                <Grid container >
+
 
                                     <Grid item xs={12} style={{ padding: '18px 20px 10px' }}>
                                         <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '16px' }}>Transcription 📜 </Typography>
@@ -907,7 +1015,7 @@ export default function Home() {
 
                                 </Button> : <></>
                             }
-                            
+
 
 
                         </Grid>
@@ -1298,7 +1406,7 @@ export default function Home() {
                             display: 'flex',
                             justifyContent: 'center'
                         }}>
-                            <Button variant="contained" style={{ width: '100%', background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} startIcon={<SubjectRoundedIcon />}>
+                            <Button onClick={() => setTextSummaryOpen(true)} variant="contained" style={{ width: '100%', background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} startIcon={<SubjectRoundedIcon />}>
                                 Text
                             </Button>
                         </Grid>
@@ -1317,13 +1425,13 @@ export default function Home() {
 
                 <Grid container>
                     <Grid item container gap={2} xs={12}>
-                        <Grid item xs={12}>
+                        {/* <Grid item xs={12}>
                             <div className={styles.newFolderDiv}>
                                 <Button onClick={newFolder} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} startIcon={<AddRoundedIcon />}>
                                     New Folder
                                 </Button>
                             </div>
-                        </Grid>
+                        </Grid> */}
 
                     </Grid>
                     <Grid item xs={12}>
@@ -1392,7 +1500,8 @@ export default function Home() {
                                                     <Typography variant="p" component="div" style={{
                                                         whiteSpace: "nowrap",
                                                         overflow: "hidden",
-                                                        textOverflow: "ellipsis",fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '14px', color: "#0069ff" }}>{folder}</Typography>
+                                                        textOverflow: "ellipsis", fontFamily: 'var(--font-poppins)', fontWeight: 400, fontSize: '14px', color: "#0069ff"
+                                                    }}>{folder}</Typography>
 
                                                 </div>
 
@@ -1413,7 +1522,7 @@ export default function Home() {
 
 
 
-                           
+
 
 
                         </div>
@@ -1423,11 +1532,11 @@ export default function Home() {
                             {selectedFolder?.__uplodedFiles__
                                 && selectedFolder?.__uplodedFiles__
                                     ?.length > 0 && (
-                                <div className="uploaded-files-section" style={{ display: 'flex' }}>
+                                    <div className="uploaded-files-section" style={{ display: 'flex' }}>
 
                                         {selectedFolder.__uplodedFiles__
                                             .map((file, index) => (
-                                                <div  key={index} style={{ margin: '10px', cursor: 'pointer', position: 'relative', width:'100px' }}>
+                                                <div key={index} style={{ margin: '10px', cursor: 'pointer', position: 'relative', width: '100px' }}>
 
 
 
@@ -1453,7 +1562,7 @@ export default function Home() {
                                             ))}
                                     </div>
                                 )}
-</div>
+                        </div>
 
 
                         {/* <p>{
