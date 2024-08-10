@@ -127,8 +127,7 @@ export default function Home() {
     const sumbitText = () => {
         // Use textContent here for your summarization logic
         console.log('Text to summarize:', textContent);
-        // Add your summarization logic here
-
+        // summarization logic here
 
         callSummarizeAPI(textContent, { type: 'text' });
     };
@@ -156,7 +155,7 @@ export default function Home() {
                 .then((response) => {
                     console.log('File uploaded successfully:', response);
 
-                    // Create a shared link for the uploaded file
+                    // Creating a shared link for the uploaded file
                     return dbx.sharingCreateSharedLinkWithSettings({
                         path: response.result.path_display
                     });
@@ -168,9 +167,9 @@ export default function Home() {
                     
                     if (file.type.includes('audio')) {
                         console.log('File type is audio');
-console.log("---------------")
 
-                        // const audioUrl = modifyDropboxUrl(sharedLinkResponse?.result?.url);
+
+                        
                         let newUrl = sharedLinkResponse?.result?.url?.slice(0, -4) + 'raw=1'
                         console.log("newUrl", newUrl)
                         const config = {
@@ -196,37 +195,7 @@ console.log("---------------")
                             console.log("temp", temp)
 
                             callSummarizeAPI(transcript.text, { type: 'customaudio', url: sharedLinkResponse?.result?.url });
-                            // JJJJ
-                            // if (selectedFolderName === 'Home') {
-
-                            //     setFiles({ ...files, [selectedFolderName]: temp })
-                            //     console.log("files", files)
-
-                            //     const { data, error } = await supabase
-                            //         .from('fileManager')
-                            //         .update([{ userId: session?.user?.id, folders: JSON.stringify({ ...files, [selectedFolderName]: temp }) }])
-                            //         .eq('userId', session?.user?.id)
-                            //         .select()
-                            // }
-                            // else {
-                            //     let param = {
-                            //         "Home": {
-                            //             ...files['Home'],
-                            //             [selectedFolderName]: temp
-
-                            //         }
-                            //     }
-
-
-                            //     setFiles({ ...files, [selectedFolderName]: temp })
-                            //     console.log("files", files)
-
-                            //     const { data, error } = await supabase
-                            //         .from('fileManager')
-                            //         .update([{ userId: session?.user?.id, folders: JSON.stringify(param) }])
-                            //         .eq('userId', session?.user?.id)
-                            //         .select()
-                            // }
+                            
 
 
 
@@ -471,11 +440,7 @@ console.log("---------------")
 
     const addFile = async () => {
         console.log("file", files?.Home);
-        // const { data, error } = await supabase
-        //     .from('fileManager')
-        //     .update([{ userId: session?.user?.id, folders: JSON.stringify(param) }])
-        //     .eq('userId', session?.user?.id)
-        //     .select()
+        
     }
 
     const searchYoutubeURL = () => {
@@ -498,7 +463,7 @@ console.log("---------------")
         if (match) {
             const videoId = match[1]; // Extracted video ID
             console.log('YouTube Video ID:', videoId);
-            // You can also update state if you need to
+            
 
 
             const out = fetchVideoData(videoId);
@@ -555,30 +520,7 @@ console.log("---------------")
     };
 
 
-    // const fetchVideoData = async (video) => {
-        // // Define the API endpoint
-        // const apiUrl = `https://ez-summarizer-youtube-caption-fetcher.vercel.app/content/${video}`;
-
-        // // Make the GET request using fetch
-        // fetch(apiUrl)
-        //     .then(response => {
-        //         // Check if the response is successful
-        //         if (!response.ok) {
-        //             throw new Error('Network response was not ok ' + response.statusText);
-        //         }
-        //         return response.json(); // Parse the JSON from the response
-        //     })
-        //     .then(data => {
-        //         // Handle the data from the API
-        //         console.log(data);
-        //         setCaptions(data)
-        //         return data;
-        //     })
-        //     .catch(error => {
-        //         // Handle any errors that occurred during the fetch
-        //         console.error('There was a problem with the fetch operation:', error);
-        //     });
-    // };
+    
 
     useEffect(() => {
         console.log("Captions", captions?.captions);
