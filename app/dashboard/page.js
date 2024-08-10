@@ -163,21 +163,16 @@ export default function Home() {
                     console.log('Shared link created:', sharedLinkResponse.result.url);
                     // You can now use sharedLinkResponse.result.url as the link to the uploaded file
                     console.log("file.type", file.type)
-                    setTimeout(() => {
-                        
-                    }, 2500);
+                    
                     if (file.type.includes('audio')) {
                         console.log('File type is audio');
+console.log("---------------")
 
-                        
-
-
-                        
-
-                        const audioUrl = modifyDropboxUrl(sharedLinkResponse?.result?.url);
-                        console.log("audioUrl", audioUrl)
+                        // const audioUrl = modifyDropboxUrl(sharedLinkResponse?.result?.url);
+                        let newUrl = sharedLinkResponse?.result?.url?.slice(0, -4) + 'raw=1'
+                        console.log("newUrl", newUrl)
                         const config = {
-                            audio_url: audioUrl
+                            audio_url: newUrl
                         }
 
                         const run = async () => {
