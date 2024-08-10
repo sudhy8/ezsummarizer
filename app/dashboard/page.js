@@ -64,6 +64,9 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
     boxShadow: 'none',
     borderBottom: `1px solid ${theme.palette.divider}`,
 }));
+
+import dbx from "@/app/service/dropbox";
+
 export default function Home() {
     const router = useRouter();
     const { register, reset, handleSubmit, formState: { errors } } = useForm();
@@ -135,7 +138,7 @@ export default function Home() {
         setAudioLoader(true);
         setAudioLoaderStatus('Uploading file...');
         const accessToken = 'sl.B6v4Nj9onYHpqVQZ381Os__L4G1raYfy8N8MXi9jeSTYpxRJzrZVZsMaziyIPwzyig3-roBdK7OJ4amfO5200KQ2Brd4qn44IgbmDTmycbnQsV1nnXnBxiYf6-fScjuP2uc6QVR968pNgEQf3RmGfUk' // Replace with your access token
-        const dbx = new Dropbox({ accessToken });
+        // const dbx = new Dropbox({ accessToken });
 
         const reader = new FileReader();
         reader.onload = function (event) {
