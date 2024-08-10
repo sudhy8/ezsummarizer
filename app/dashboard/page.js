@@ -85,7 +85,9 @@ export default function Home() {
     const [summaryLoading, setSummaryLoading] = useState(false);
     const [textSummaryOpen, setTextSummaryOpen] = useState(false);
 
-
+    const client = new AssemblyAI({
+        apiKey: "2bf1061ce19a48369e3adbabffdb0a44"
+    })
 
 
     const [audioOpen, setAudioOpen] = React.useState(false);
@@ -167,9 +169,7 @@ export default function Home() {
 
 
 
-                        const client = new AssemblyAI({
-                            apiKey: "2bf1061ce19a48369e3adbabffdb0a44"
-                        })
+                        
 
                         const audioUrl = modifyDropboxUrl(sharedLinkResponse?.result?.url);
                         console.log("audioUrl", audioUrl)
