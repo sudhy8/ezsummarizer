@@ -172,7 +172,7 @@ export default function Home() {
                         })
 
                         const audioUrl = modifyDropboxUrl(sharedLinkResponse?.result?.url);
-
+                        console.log("audioUrl", audioUrl)
                         const config = {
                             audio_url: audioUrl
                         }
