@@ -1600,7 +1600,7 @@ export default function Home() {
                             {selectedFolder?.__uplodedFiles__
                                 && selectedFolder?.__uplodedFiles__
                                     ?.length > 0 && (
-                                    <div className="uploaded-files-section" style={{ display: 'flex' }}>
+                                    <div className="uploaded-files-section" style={{ display: 'flex',flexWrap:'wrap' }}>
 
                                         {selectedFolder.__uplodedFiles__
                                             .map((file, index) => (
