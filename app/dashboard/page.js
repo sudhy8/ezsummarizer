@@ -1498,13 +1498,13 @@ console.log("---------------")
 
                 <Grid container>
                     <Grid item container gap={2} xs={12}>
-                        {/* <Grid item xs={12}>
+                        <Grid item xs={12}>
                             <div className={styles.newFolderDiv}>
                                 <Button onClick={newFolder} variant="contained" style={{ background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} startIcon={<AddRoundedIcon />}>
                                     New Folder
                                 </Button>
                             </div>
-                        </Grid> */}
+                        </Grid>
 
                     </Grid>
                     <Grid item xs={12}>
