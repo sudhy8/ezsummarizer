@@ -93,6 +93,8 @@ export default function Home() {
     const [audioOpen, setAudioOpen] = React.useState(false);
     const notify = () => toast.success("Recording Started...!");
     const notify2 = () => toast.error("Recording Stopped!");
+    const notify3 = () => toast.success("Summarization initiated...!");
+
 
     const [file, setFile] = useState(null);
     const [audioLoader, setAudioLoader] = useState(false);
@@ -694,8 +696,10 @@ console.log("---------------")
     const apiUrl = 'http://20.151.83.246:8000/summarize';
     // Function to call the API
     async function callSummarizeAPI(captionTexts, param = { type: 'default' }) {
+        notify3();
         setSummaryLoading(true)
         try {
+
             // Make the POST request
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -1451,7 +1455,7 @@ console.log("---------------")
                             justifyContent: 'center',
                             // padding:" 0px 0px 0px 10px"
                         }}>
-                            <Button onClick={() => setAudioOpen(true)} variant="contained" style={{ width: 'calc(100% - 0px)', marginLeft: '10px', background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}
+                            <Button onClick={() => { setAudioOpen(true); setSummary('') }} variant="contained" style={{ width: 'calc(100% - 0px)', marginLeft: '10px', background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }}
                                 startIcon={
                                     !isListening ?
 
@@ -1475,7 +1479,7 @@ console.log("---------------")
                             display: 'flex',
                             justifyContent: 'center'
                         }}>
-                            <Button onClick={() => setTextSummaryOpen(true)} variant="contained" style={{ width: '100%', background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} startIcon={<SubjectRoundedIcon />}>
+                            <Button onClick={() => {setTextSummaryOpen(true); setSummary('') }} variant="contained" style={{ width: '100%', background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} startIcon={<SubjectRoundedIcon />}>
                                 Text
                             </Button>
                         </Grid>
@@ -1483,7 +1487,7 @@ console.log("---------------")
                             display: 'flex',
                             justifyContent: 'center'
                         }}>
-                            <Button onClick={() => setFileOpen(true)} variant="contained" style={{ width: '100%', background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} startIcon={<FileUploadRoundedIcon />}>
+                            <Button onClick={() => {setFileOpen(true); setSummary('') }} variant="contained" style={{ width: '100%', background: "#cce4ff", color: "#0069ff", boxShadow: "none", fontFamily: "var(--font-poppins-bold)", textTransform: "none", fontWeight: 500 }} startIcon={<FileUploadRoundedIcon />}>
                                 Upload
 
                             </Button>
