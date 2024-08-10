@@ -140,7 +140,7 @@ export default function Home() {
         setAudioLoader(true);
         setAudioLoaderStatus('Uploading file...');
         const accessToken = 'sl.B6v4Nj9onYHpqVQZ381Os__L4G1raYfy8N8MXi9jeSTYpxRJzrZVZsMaziyIPwzyig3-roBdK7OJ4amfO5200KQ2Brd4qn44IgbmDTmycbnQsV1nnXnBxiYf6-fScjuP2uc6QVR968pNgEQf3RmGfUk' // Replace with your access token
-        // const dbx = new Dropbox({ accessToken });
+        const abc = new Dropbox({ accessToken });
 
         const reader = new FileReader();
         reader.onload = function (event) {
