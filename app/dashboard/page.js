@@ -509,30 +509,73 @@ export default function Home() {
     }
 
 
-    const fetchVideoData = async (video) => {
-        // Define the API endpoint
-        const apiUrl = `https://ez-summarizer-youtube-caption-fetcher.vercel.app/content/${video}`;
+    const [youtubeUrl, setYoutubeUrl] = useState('');
+    const [audioBlob, setAudioBlob] = useState(null);
 
-        // Make the GET request using fetch
-        fetch(apiUrl)
-            .then(response => {
-                // Check if the response is successful
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json(); // Parse the JSON from the response
-            })
-            .then(data => {
-                // Handle the data from the API
-                console.log(data);
-                setCaptions(data)
-                return data;
-            })
-            .catch(error => {
-                // Handle any errors that occurred during the fetch
-                console.error('There was a problem with the fetch operation:', error);
+    const fetchVideoData = async (video) => {
+        try {
+            const response = await axios.get(`http://localhost:8000/download_audio/`, {
+                params: { url: video },
+                responseType: 'blob', // Important to get the response as a Blob
             });
+
+            setAudioBlob(response.data);
+
+            // Optionally, create a URL for the Blob to play or download
+            const audioUrl = URL.createObjectURL(response.data);
+            const audio = new Audio(audioUrl);
+            audio.play();
+
+            // If you need to send this Blob to another API
+            // sendAudioToAnotherAPI(response.data);
+        } catch (error) {
+            console.error('Error downloading audio:', error);
+        }
     };
+
+    // Example function to send the audio Blob to another API
+    const sendAudioToAnotherAPI = async (audioBlob) => {
+        try {
+            const formData = new FormData();
+            formData.append('file', audioBlob, 'audio.mp3');
+
+            await axios.post('http://another-api.com/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            console.log('Audio sent to another API successfully');
+        } catch (error) {
+            console.error('Error sending audio to another API:', error);
+        }
+    };
+
+
+    // const fetchVideoData = async (video) => {
+        // // Define the API endpoint
+        // const apiUrl = `https://ez-summarizer-youtube-caption-fetcher.vercel.app/content/${video}`;
+
+        // // Make the GET request using fetch
+        // fetch(apiUrl)
+        //     .then(response => {
+        //         // Check if the response is successful
+        //         if (!response.ok) {
+        //             throw new Error('Network response was not ok ' + response.statusText);
+        //         }
+        //         return response.json(); // Parse the JSON from the response
+        //     })
+        //     .then(data => {
+        //         // Handle the data from the API
+        //         console.log(data);
+        //         setCaptions(data)
+        //         return data;
+        //     })
+        //     .catch(error => {
+        //         // Handle any errors that occurred during the fetch
+        //         console.error('There was a problem with the fetch operation:', error);
+        //     });
+    // };
 
     useEffect(() => {
         console.log("Captions", captions?.captions);
@@ -1212,6 +1255,31 @@ export default function Home() {
 
                         </Grid>
 
+                        <Grid item xs={12} >
+                            
+                            {
+                                summary &&
+                                <Grid item xs={12} >
+                                    <Grid container >
+
+                                        <Grid item xs={12} style={{ padding: '18px 20px 10px' }}>
+                                            <Typography variant="p" component="div" style={{ fontFamily: 'var(--font-poppins-bold)', fontWeight: 500, fontSize: '16px' }}>Summary </Typography>
+
+
+                                        </Grid>
+                                    </Grid>
+                                    <Divider style={{ margin: '10px 0' }} />
+                                    <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+
+                                        <Typewriter text={summary || ''} delay={2} />
+
+                                    </div>
+                                    <Box component="section" sx={{ p: { xs: 1, sm: 2, lg: 5 } }}></Box>
+
+                                </Grid>
+                            }
+                        </Grid>
+
 
                         <Grid item xs={12} style={{ padding: '15px 0px 0px', display: 'flex', justifyContent: 'flex-end' }}>
 
@@ -1338,7 +1406,7 @@ export default function Home() {
             <Container style={{ padding: "15px" }}>
                 <Grid container>
                     <Grid item container spacing={1} xs={12} style={{ padding: '10px', background: 'aliceblue', margin: '10px 0px' }}>
-                        <Grid item xs={6}>
+                        {/* <Grid item xs={6}>
 
                             <div style={{ position: 'relative', width: '100%' }}>
                                 <input
@@ -1376,8 +1444,8 @@ export default function Home() {
                                     Search
                                 </Button>
                             </div>
-                        </Grid>
-                        <Grid item xs={2} style={{
+                        </Grid> */}
+                        <Grid item xs={4} style={{
                             display: 'flex',
                             justifyContent: 'center',
                             // padding:" 0px 0px 0px 10px"
@@ -1402,7 +1470,7 @@ export default function Home() {
                             </Button>
                         </Grid>
 
-                        <Grid item xs={2} style={{
+                        <Grid item xs={4} style={{
                             display: 'flex',
                             justifyContent: 'center'
                         }}>
@@ -1410,7 +1478,7 @@ export default function Home() {
                                 Text
                             </Button>
                         </Grid>
-                        <Grid item xs={2} style={{
+                        <Grid item xs={4} style={{
                             display: 'flex',
                             justifyContent: 'center'
                         }}>
