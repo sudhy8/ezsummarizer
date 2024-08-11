@@ -35,24 +35,26 @@ import LogoutTwoToneIcon from '@mui/icons-material/LogoutTwoTone';
 import IconButton from '@mui/material/IconButton';
 import { useRouter } from 'next/navigation';
 
+// Importing Supabase client creation function
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 )
 
-
+//creating an AppBar that changes elevation (shadow) when the user scrolls
 function ElevationScroll(props) {
-  const { children } = props;
+  const { children } = props; // Destructure children from props
   const trigger = useScrollTrigger({
     disableHysteresis: true,
-    threshold: 0,
+    threshold: 0, // Trigger at the top of the page (0px from the top)
   });
 
+  // Clone the child element with a modified elevation prop based on the scroll position
   return React.cloneElement(children, {
     elevation: trigger ? 4 : 0,
   });
 }
-
+// Define the expected prop types for the ElevationScroll component
 ElevationScroll.propTypes = {
   children: PropTypes.element.isRequired,
 };
@@ -63,6 +65,7 @@ export default function ElevateAppBar() {
 
   const [scrollPosition, setScrollPosition] = useState(0);
 
+  // Destructure various utilities from react-hook-form for form handling
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [charCount, setCharCount] = useState(0);
   const [description, setDescription] = useState(null);
@@ -74,6 +77,7 @@ export default function ElevateAppBar() {
   const [session, setSession] = useState(null)
 
   useEffect(() => {
+    // Fetch the current session from Supabase
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log("session", session)
       setSession(session)
@@ -117,6 +121,7 @@ export default function ElevateAppBar() {
     return result;
   }
 
+  // Function to handle logging out the user using Supabase authentication
   const logOut = async() => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -184,6 +189,7 @@ export default function ElevateAppBar() {
     return () => window.removeEventListener('scroll', updatePosition);
   }, []);
 
+  // Function to navigate the user to the dashboard page
   const toDashboard = () => {
     router.push('/dashboard');
   }
@@ -294,6 +300,7 @@ export default function ElevateAppBar() {
       <Toolbar />
 
 
+      //Main container for the summarization feature
       <Container style={{
         padding: "84px 25px",
         background: 'aliceblue', borderRadius: '35px',
