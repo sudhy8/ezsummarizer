@@ -1,8 +1,8 @@
-# ezummerier Project
+# ezsummarizer Project
 
 ## Overview
 
-The ezummerier project is focused on developing a comprehensive architecture that leverages cutting-edge technologies to summarize audio, text, and video content. This system integrates various tools and platforms to efficiently manage user interactions, media processing, and data storage, resulting in precise and relevant summaries across multiple content types. The architecture is scalable and adaptable, suitable for applications such as podcast transcription, video and audio content summarization, and article summarization.
+The ezsummarizer project is focused on developing a comprehensive architecture that leverages cutting-edge technologies to summarize audio, text, and video content. This system integrates various tools and platforms to efficiently manage user interactions, media processing, and data storage, resulting in precise and relevant summaries across multiple content types. The architecture is scalable and adaptable, suitable for applications such as podcast transcription, video and audio content summarization, and article summarization.
 ## Project Structure
 
 - **Vercel**: Used for deployment, ensuring a seamless and scalable hosting environment.
@@ -23,12 +23,12 @@ The ezummerier project is focused on developing a comprehensive architecture tha
 
 ## Installation
 
-To run the ezummerier project locally, follow these steps:
+To run the ezsummarizer project locally, follow these steps:
 
 1. Clone this repository to your local machine:
     ```bash
-    git clone https://github.com/yourusername/ezummerier.git
-    cd ezummerier
+    git clone [https://github.com/sudhy8/ezsummarizer.git]
+    cd ezsummarizer
     ```
 2. Install the necessary dependencies:
     ```bash
